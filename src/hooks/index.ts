@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 
 import { ChainId } from '../sdk'
-import { injected } from '../connectors'
+import { injected, addTenTestnetToMetaMask } from '../connectors'
 
 export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
   const context = useWeb3ReactCore<Web3Provider>()
@@ -20,12 +20,17 @@ export function useEagerConnect() {
     injected.isAuthorized().then(isAuthorized => {
       if (isAuthorized) {
         activate(injected, undefined, true).catch(() => {
-          setTried(true)
+          // If activation fails, prompt to add TEN Testnet network
+          addTenTestnetToMetaMask().finally(() => {
+            setTried(true)
+          })
         })
       } else {
         if (isMobile && window.ethereum) {
           activate(injected, undefined, true).catch(() => {
-            setTried(true)
+            addTenTestnetToMetaMask().finally(() => {
+              setTried(true)
+            })
           })
         } else {
           setTried(true)

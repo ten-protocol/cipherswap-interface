@@ -15,19 +15,19 @@ import {
 describe('utils', () => {
   describe('#getEtherscanLink', () => {
     it('correct for tx', () => {
-      expect(getScanLink(2442, 'abc', 'transaction')).toEqual('https://cardona-zkevm.polygonscan.com/tx/abc')
+      expect(getScanLink(8443, 'abc', 'transaction')).toEqual('https://testnet.tenscan.io/tx/abc')
     })
     it('correct for token', () => {
-      expect(getScanLink(2442, 'abc', 'token')).toEqual('https://cardona-zkevm.polygonscan.com/token/abc')
+      expect(getScanLink(8443, 'abc', 'token')).toEqual('https://testnet.tenscan.io/token/abc')
     })
     it('correct for address', () => {
-      expect(getScanLink(2442, 'abc', 'address')).toEqual('https://cardona-zkevm.polygonscan.com/address/abc')
+      expect(getScanLink(8443, 'abc', 'address')).toEqual('https://testnet.tenscan.io/address/abc')
     })
   })
 
   describe('#calculateSlippageAmount', () => {
     it('bounds are correct', () => {
-      const tokenAmount = new TokenAmount(new Token(ChainId.CARDONA, AddressZero, 0), '100')
+      const tokenAmount = new TokenAmount(new Token(ChainId.TEN_TESTNET, AddressZero, 0), '100')
       expect(() => calculateSlippageAmount(tokenAmount, -1)).toThrow()
       expect(calculateSlippageAmount(tokenAmount, 0).map(bound => bound.toString())).toEqual(['100', '100'])
       expect(calculateSlippageAmount(tokenAmount, 100).map(bound => bound.toString())).toEqual(['99', '101'])

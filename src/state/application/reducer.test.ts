@@ -13,7 +13,7 @@ describe('application reducer', () => {
       walletModalOpen: false,
       settingsMenuOpen: false,
       blockNumber: {
-        [ChainId.CARDONA]: 3
+        [ChainId.TEN_TESTNET]: 3
       }
     })
   })
@@ -65,12 +65,12 @@ describe('application reducer', () => {
 
   describe('updateBlockNumber', () => {
     it('updates block number', () => {
-      store.dispatch(updateBlockNumber({ chainId: ChainId.CARDONA, blockNumber: 4 }))
-      expect(store.getState().blockNumber[ChainId.CARDONA]).toEqual(4)
+      store.dispatch(updateBlockNumber({ chainId: ChainId.TEN_TESTNET, blockNumber: 4 }))
+      expect(store.getState().blockNumber[ChainId.TEN_TESTNET]).toEqual(4)
     })
     it('no op if late', () => {
-      store.dispatch(updateBlockNumber({ chainId: ChainId.CARDONA, blockNumber: 2 }))
-      expect(store.getState().blockNumber[ChainId.CARDONA]).toEqual(3)
+      store.dispatch(updateBlockNumber({ chainId: ChainId.TEN_TESTNET, blockNumber: 2 }))
+      expect(store.getState().blockNumber[ChainId.TEN_TESTNET]).toEqual(3)
     })
   })
 

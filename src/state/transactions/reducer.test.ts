@@ -16,7 +16,7 @@ describe('transaction reducer', () => {
       const beforeTime = new Date().getTime()
       store.dispatch(
         addTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           summary: 'hello world',
           hash: '0x0',
           approval: { tokenAddress: 'abc', spender: 'def' },
@@ -24,9 +24,9 @@ describe('transaction reducer', () => {
         })
       )
       const txs = store.getState()
-      expect(txs[ChainId.CARDONA]).toBeTruthy()
-      expect(txs[ChainId.CARDONA]?.['0x0']).toBeTruthy()
-      const tx = txs[ChainId.CARDONA]?.['0x0']
+      expect(txs[ChainId.TEN_TESTNET]).toBeTruthy()
+      expect(txs[ChainId.TEN_TESTNET]?.['0x0']).toBeTruthy()
+      const tx = txs[ChainId.TEN_TESTNET]?.['0x0']
       expect(tx).toBeTruthy()
       expect(tx?.hash).toEqual('0x0')
       expect(tx?.summary).toEqual('hello world')
@@ -40,7 +40,7 @@ describe('transaction reducer', () => {
     it('no op if not valid transaction', () => {
       store.dispatch(
         finalizeTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           hash: '0x0',
           receipt: {
             status: 1,
@@ -60,7 +60,7 @@ describe('transaction reducer', () => {
       store.dispatch(
         addTransaction({
           hash: '0x0',
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           approval: { spender: '0x0', tokenAddress: '0x0' },
           summary: 'hello world',
           from: '0x0'
@@ -69,7 +69,7 @@ describe('transaction reducer', () => {
       const beforeTime = new Date().getTime()
       store.dispatch(
         finalizeTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           hash: '0x0',
           receipt: {
             status: 1,
@@ -83,7 +83,7 @@ describe('transaction reducer', () => {
           }
         })
       )
-      const tx = store.getState()[ChainId.CARDONA]?.['0x0']
+      const tx = store.getState()[ChainId.TEN_TESTNET]?.['0x0']
       expect(tx?.summary).toEqual('hello world')
       expect(tx?.confirmedTime).toBeGreaterThanOrEqual(beforeTime)
       expect(tx?.receipt).toEqual({
@@ -103,7 +103,7 @@ describe('transaction reducer', () => {
     it('no op if not valid transaction', () => {
       store.dispatch(
         checkedTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           hash: '0x0',
           blockNumber: 1
         })
@@ -114,7 +114,7 @@ describe('transaction reducer', () => {
       store.dispatch(
         addTransaction({
           hash: '0x0',
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           approval: { spender: '0x0', tokenAddress: '0x0' },
           summary: 'hello world',
           from: '0x0'
@@ -122,19 +122,19 @@ describe('transaction reducer', () => {
       )
       store.dispatch(
         checkedTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           hash: '0x0',
           blockNumber: 1
         })
       )
-      const tx = store.getState()[ChainId.CARDONA]?.['0x0']
+      const tx = store.getState()[ChainId.TEN_TESTNET]?.['0x0']
       expect(tx?.lastCheckedBlockNumber).toEqual(1)
     })
     it('never decreases', () => {
       store.dispatch(
         addTransaction({
           hash: '0x0',
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           approval: { spender: '0x0', tokenAddress: '0x0' },
           summary: 'hello world',
           from: '0x0'
@@ -142,19 +142,19 @@ describe('transaction reducer', () => {
       )
       store.dispatch(
         checkedTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           hash: '0x0',
           blockNumber: 3
         })
       )
       store.dispatch(
         checkedTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           hash: '0x0',
           blockNumber: 1
         })
       )
-      const tx = store.getState()[ChainId.CARDONA]?.['0x0']
+      const tx = store.getState()[ChainId.TEN_TESTNET]?.['0x0']
       expect(tx?.lastCheckedBlockNumber).toEqual(3)
     })
   })
@@ -163,7 +163,7 @@ describe('transaction reducer', () => {
     it('removes all transactions for the chain', () => {
       store.dispatch(
         addTransaction({
-          chainId: ChainId.CARDONA,
+          chainId: ChainId.TEN_TESTNET,
           summary: 'hello world',
           hash: '0x0',
           approval: { tokenAddress: 'abc', spender: 'def' },
@@ -171,10 +171,10 @@ describe('transaction reducer', () => {
         })
       )
       expect(Object.keys(store.getState())).toHaveLength(1)
-      expect(Object.keys(store.getState()[ChainId.CARDONA] ?? {})).toEqual(['0x0'])
-      store.dispatch(clearAllTransactions({ chainId: ChainId.CARDONA }))
+      expect(Object.keys(store.getState()[ChainId.TEN_TESTNET] ?? {})).toEqual(['0x0'])
+      store.dispatch(clearAllTransactions({ chainId: ChainId.TEN_TESTNET }))
       expect(Object.keys(store.getState())).toHaveLength(1)
-      expect(Object.keys(store.getState()[ChainId.CARDONA] ?? {})).toEqual([])
+      expect(Object.keys(store.getState()[ChainId.TEN_TESTNET] ?? {})).toEqual([])
     })
   })
 })

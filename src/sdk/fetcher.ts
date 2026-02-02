@@ -10,8 +10,9 @@ import { ChainId } from './constants'
 import { Token } from './entities/token'
 
 let TOKEN_DECIMALS_CACHE: { [chainId: number]: { [address: string]: number } } = {
-  [ChainId.CARDONA]: {
-    '0x67385C066C14E3F5FA5Ca4C7755ae13883d09a18': 18 // ARB
+  [ChainId.TEN_TESTNET]: {
+    '0x910c2a26649063a37fc507EC827fF7f6784133a1': 18, // ALPHA
+    '0xD3C60e71391b8F481222546c80F046a73AA4611f': 18  // BETA
   }
 }
 

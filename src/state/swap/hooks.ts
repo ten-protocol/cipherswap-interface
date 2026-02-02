@@ -190,14 +190,17 @@ export function useDerivedSwapInfo(): {
   }
 }
 
+// Default to ALPHA token address instead of ETH (no native currency on TEN testnet)
+const DEFAULT_CURRENCY = '0x910c2a26649063a37fc507EC827fF7f6784133a1'
+
 function parseCurrencyFromURLParameter(urlParam: any): string {
   if (typeof urlParam === 'string') {
     const valid = isAddress(urlParam)
     if (valid) return valid
-    if (urlParam.toUpperCase() === 'ETH') return 'ETH'
-    if (valid === false) return 'ETH'
+    if (urlParam.toUpperCase() === 'ETH') return DEFAULT_CURRENCY
+    if (valid === false) return DEFAULT_CURRENCY
   }
-  return 'ETH' ?? ''
+  return DEFAULT_CURRENCY ?? ''
 }
 
 function parseTokenAmountURLParameter(urlParam: any): string {

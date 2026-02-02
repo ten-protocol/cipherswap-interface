@@ -46,10 +46,8 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
 
-  const showETH: boolean = useMemo(() => {
-    const s = searchQuery.toLowerCase().trim()
-    return s === '' || s === 'e' || s === 'et' || s === 'eth'
-  }, [searchQuery])
+  // ETH/native currency disabled -- TEN testnet uses token-to-token swaps only
+  const showETH: boolean = false
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 

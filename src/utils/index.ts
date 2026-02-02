@@ -17,11 +17,11 @@ export function isAddress(value: any): string | false {
 }
 
 const SCAN_PREFIXES: { [chainId in ChainId]: string } = {
-  2442: 'cardona-zkevm.'
+  [ChainId.TEN_TESTNET]: 'https://testnet.tenscan.io'
 }
 
 export function getScanLink(chainId: ChainId, data: string, type: 'transaction' | 'token' | 'address'): string {
-  const prefix = `https://${SCAN_PREFIXES[chainId] || ''}polygonscan.com`
+  const prefix = SCAN_PREFIXES[chainId] || 'https://testnet.tenscan.io'
 
   switch (type) {
     case 'transaction': {

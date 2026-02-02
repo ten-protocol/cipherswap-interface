@@ -120,7 +120,7 @@ const BalanceText = styled(Text)`
 `
 
 const NETWORK_LABELS: { [chainId in ChainId]: string | null } = {
-  [ChainId.CARDONA]: 'CARDONA'
+  [ChainId.TEN_TESTNET]: 'TEN Testnet'
 }
 
 export default function Header() {
