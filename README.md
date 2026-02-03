@@ -1,4 +1,4 @@
-# Lampswap Interface
+# CipherSwap
 
 ## Development
 

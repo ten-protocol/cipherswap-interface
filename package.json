@@ -1,6 +1,6 @@
 {
   "name": "@lampswap/interface",
-  "description": "Lampswap Interface",
+  "description": "CipherSwap",
   "homepage": ".",
   "private": true,
   "dependencies": {

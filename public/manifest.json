@@ -1,6 +1,6 @@
 {
-  "short_name": "Lampswap",
-  "name": "Lampswap",
+  "short_name": "CipherSwap",
+  "name": "CipherSwap",
   "icons": [
     {
       "src": "./images/192x192_App_Icon.png",
@@ -17,6 +17,6 @@
   ],
   "orientation": "portrait",
   "display": "standalone",
-  "theme_color": "#080f2b",
-  "background_color": "#fff"
+  "theme_color": "#0A0A0F",
+  "background_color": "#0A0A0F"
 }
