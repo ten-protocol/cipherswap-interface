@@ -1,5 +1,7 @@
 # CipherSwap
 
+A decentralized exchange built on [TEN Protocol](https://ten.xyz) - the encrypted Ethereum L2.
+
 ## Development
 
 ### Install Dependencies
@@ -8,21 +10,36 @@
 yarn
 ```
 
+### Configure Environment
+
+1. Copy `.env` to `.env.local`
+2. Get a TEN Gateway token from [https://testnet.ten.xyz](https://testnet.ten.xyz)
+3. Update `.env.local`:
+
+```bash
+REACT_APP_CHAIN_ID="8443"
+REACT_APP_NETWORK_URL="https://testnet.ten.xyz/v1/?token=YOUR_TEN_GATEWAY_TOKEN"
+```
+
 ### Run
 
 ```bash
 yarn start
 ```
 
-### Configuring the environment (optional)
+## Deployed Contracts (TEN Testnet)
 
-To have the interface default to a different network when a wallet is not connected:
+| Contract | Address |
+|----------|---------|
+| Factory | `0x38b8773E1B048fbBb4f4620b2861db8703aBE7b9` |
+| Router | `0x9cF6C659F173916f4928420E72DE53E667DbDf73` |
+| Multicall | `0x29A8E964a4e220e3438e39dDDd01B4A3305A7c54` |
+| ALPHA Token | `0x910c2a26649063a37fc507EC827fF7f6784133a1` |
+| BETA Token | `0xD3C60e71391b8F481222546c80F046a73AA4611f` |
 
-1. Make a copy of `.env` named `.env.local`
-2. Change `REACT_APP_NETWORK_ID` to `"{YOUR_NETWORK_ID}"`
-3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://{YOUR_NETWORK_ID}.infura.io/v3/{YOUR_INFURA_KEY}"` 
+## Network Details
 
-Note that the interface only works on testnets where both 
-[Uniswap V2](https://uniswap.org/docs/v2/smart-contracts/factory/) and 
-[multicall](https://github.com/makerdao/multicall) are deployed.
-The interface will not work on other networks.
+- **Network**: TEN Testnet
+- **Chain ID**: 8443
+- **RPC**: `https://testnet.ten.xyz/v1/?token=YOUR_TOKEN`
+- **Block Explorer**: [https://testnet.tenscan.io](https://testnet.tenscan.io)
