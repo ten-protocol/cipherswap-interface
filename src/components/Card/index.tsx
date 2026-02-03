@@ -16,10 +16,23 @@ export default Card
 export const LightCard = styled(Card)`
   border: 1px solid ${({ theme }) => theme.bg2};
   background-color: ${({ theme }) => theme.bg1};
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    border-color: rgba(0, 212, 170, 0.2);
+    box-shadow: 0 0 15px rgba(0, 212, 170, 0.1);
+  }
 `
 
 export const GreyCard = styled(Card)`
   background-color: ${({ theme }) => theme.bg3};
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    border-color: rgba(0, 212, 170, 0.15);
+    box-shadow: 0 0 12px rgba(0, 212, 170, 0.08);
+  }
 `
 
 export const OutlineCard = styled(Card)`

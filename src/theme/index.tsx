@@ -80,7 +80,14 @@ export function colors(darkMode: boolean): Colors {
     red2: '#F82D3A',
     green1: '#27AE60',
     yellow1: '#FFFFFF',
-    yellow2: '#00D4AA'
+    yellow2: '#00D4AA',
+
+    // glow effects
+    glow1: '#00D4AA',
+    glow2: 'rgba(0, 212, 170, 0.4)',
+    glowShadow: '0 0 20px rgba(0, 212, 170, 0.3)',
+    glassBackground: 'rgba(26, 26, 36, 0.7)',
+    glassBorder: 'rgba(0, 212, 170, 0.1)'
   }
 }
 
@@ -108,6 +115,21 @@ export function theme(darkMode: boolean): DefaultTheme {
     flexRowNoWrap: css`
       display: flex;
       flex-flow: row nowrap;
+    `,
+
+    // premium effects
+    glass: css`
+      background: rgba(26, 26, 36, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 212, 170, 0.1);
+    `,
+    glowHover: css`
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+      &:hover {
+        box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+        border-color: rgba(0, 212, 170, 0.3);
+      }
     `
   }
 }

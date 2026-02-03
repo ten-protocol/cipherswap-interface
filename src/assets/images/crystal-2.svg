@@ -1,0 +1,32 @@
+<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="crystalGrad2a" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1f1f35"/>
+      <stop offset="100%" stop-color="#0a0a15"/>
+    </linearGradient>
+    <linearGradient id="crystalGrad2b" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#252540"/>
+      <stop offset="100%" stop-color="#101020"/>
+    </linearGradient>
+    <filter id="crystalGlow2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feFlood flood-color="#00D4AA" flood-opacity="0.35"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#crystalGlow2)">
+    <!-- Elongated crystal -->
+    <polygon points="40,3 65,30 65,70 40,97 15,70 15,30" fill="url(#crystalGrad2a)"/>
+    <polygon points="40,3 40,97 15,70 15,30" fill="url(#crystalGrad2b)"/>
+    <!-- Inner facet -->
+    <polygon points="40,20 55,35 55,65 40,80 25,65 25,35" fill="#05050c" opacity="0.5"/>
+    <!-- Edge highlights -->
+    <line x1="40" y1="3" x2="40" y2="97" stroke="#00D4AA" stroke-width="0.4" stroke-opacity="0.5"/>
+    <line x1="15" y1="30" x2="65" y2="30" stroke="#00D4AA" stroke-width="0.3" stroke-opacity="0.3"/>
+    <line x1="15" y1="70" x2="65" y2="70" stroke="#00D4AA" stroke-width="0.3" stroke-opacity="0.3"/>
+  </g>
+</svg>

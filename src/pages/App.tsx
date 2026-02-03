@@ -1,6 +1,8 @@
 import React, { Suspense } from 'react'
 import { HashRouter, Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
+import AnimatedBackground from '../components/AnimatedBackground'
+import Footer from '../components/Footer'
 import Header from '../components/Header'
 import Popups from '../components/Popups'
 import Web3ReactManager from '../components/Web3ReactManager'
@@ -23,6 +25,8 @@ const AppWrapper = styled.div`
   flex-flow: column;
   align-items: flex-start;
   overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
 `
 
 const HeaderWrapper = styled.div`
@@ -58,6 +62,7 @@ export default function App() {
     <Suspense fallback={null}>
       <HashRouter>
         <Route component={DarkModeQueryParamReader} />
+        <AnimatedBackground />
         <AppWrapper>
           <HeaderWrapper>
             <Header />
@@ -82,6 +87,7 @@ export default function App() {
             </Web3ReactManager>
             <Marginer />
           </BodyWrapper>
+          <Footer />
         </AppWrapper>
       </HashRouter>
     </Suspense>

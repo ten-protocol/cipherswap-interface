@@ -261,7 +261,7 @@ export default function AccountDetails({
                     {chainId && account && (
                       <AddressLink href={getScanLink(chainId, account, 'address')}>
                         <LinkIcon size={16} />
-                        <span style={{ marginLeft: '4px' }}>View on Polygonscan</span>
+                        <span style={{ marginLeft: '4px' }}>View on TenScan</span>
                       </AddressLink>
                     )}
                   </div>

@@ -43,6 +43,13 @@ export interface Colors {
   green1: Color
   yellow1: Color
   yellow2: Color
+
+  // glow effects
+  glow1: Color
+  glow2: Color
+  glowShadow: string
+  glassBackground: Color
+  glassBorder: Color
 }
 
 export interface Grids {
@@ -69,5 +76,9 @@ declare module 'styled-components' {
     // css snippets
     flexColumnNoWrap: FlattenSimpleInterpolation
     flexRowNoWrap: FlattenSimpleInterpolation
+
+    // premium effects
+    glass: FlattenSimpleInterpolation
+    glowHover: FlattenSimpleInterpolation
   }
 }

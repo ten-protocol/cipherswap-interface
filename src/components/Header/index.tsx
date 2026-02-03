@@ -34,6 +34,10 @@ const HeaderFrame = styled.div`
 const HeaderElement = styled.div`
   display: flex;
   align-items: center;
+
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    flex-wrap: wrap;
+  `};
 `
 
 const HeaderElementWrap = styled.div`
@@ -106,25 +110,43 @@ const UniIcon = styled.div`
 const PoweredByBadge = styled.a`
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 11px;
+  font-weight: 500;
   color: ${({ theme }) => theme.text3};
   text-decoration: none;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-  margin-left: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(0, 212, 170, 0.08);
+  border: 1px solid rgba(0, 212, 170, 0.15);
+  margin-left: 16px;
+  transition: all 0.3s ease;
 
   :hover {
-    opacity: 1;
+    background: rgba(0, 212, 170, 0.12);
+    border-color: rgba(0, 212, 170, 0.3);
+    box-shadow: 0 0 15px rgba(0, 212, 170, 0.2);
+
+    img {
+      filter: drop-shadow(0 0 4px rgba(0, 212, 170, 0.4));
+    }
   }
 
   img {
-    height: 12px;
+    height: 14px;
     width: auto;
+    transition: filter 0.3s ease;
   }
 
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    display: none;
+    margin-left: 0;
+    margin-top: 8px;
+    padding: 4px 10px;
+    font-size: 10px;
+
+    img {
+      height: 12px;
+    }
   `};
 `
 
@@ -172,7 +194,7 @@ export default function Header() {
           </Title>
           <PoweredByBadge href="https://ten.xyz" target="_blank" rel="noopener noreferrer">
             <span>Powered by</span>
-            <img src={TenLogo} alt="TEN" />
+            <img src={TenLogo} alt="TEN Protocol" />
           </PoweredByBadge>
         </HeaderElement>
         <HeaderControls>

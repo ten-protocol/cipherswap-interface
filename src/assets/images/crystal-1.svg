@@ -1,0 +1,40 @@
+<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="crystalGrad1a" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="50%" stop-color="#0f0f1a"/>
+      <stop offset="100%" stop-color="#05050a"/>
+    </linearGradient>
+    <linearGradient id="crystalGrad1b" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a40"/>
+      <stop offset="100%" stop-color="#12121f"/>
+    </linearGradient>
+    <linearGradient id="crystalGrad1c" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#00D4AA" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00D4AA" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="crystalGlow1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feFlood flood-color="#00D4AA" flood-opacity="0.4"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Diamond/octahedron shape -->
+  <g filter="url(#crystalGlow1)">
+    <!-- Top half -->
+    <polygon points="50,5 85,60 50,60" fill="url(#crystalGrad1a)"/>
+    <polygon points="50,5 50,60 15,60" fill="url(#crystalGrad1b)"/>
+    <!-- Bottom half -->
+    <polygon points="50,115 85,60 50,60" fill="url(#crystalGrad1a)" opacity="0.8"/>
+    <polygon points="50,115 50,60 15,60" fill="#0a0a12"/>
+    <!-- Edge highlights -->
+    <line x1="50" y1="5" x2="50" y2="115" stroke="#00D4AA" stroke-width="0.5" stroke-opacity="0.5"/>
+    <line x1="15" y1="60" x2="85" y2="60" stroke="#00D4AA" stroke-width="0.3" stroke-opacity="0.3"/>
+    <line x1="50" y1="5" x2="85" y2="60" stroke="#00D4AA" stroke-width="0.3" stroke-opacity="0.4"/>
+    <line x1="50" y1="5" x2="15" y2="60" stroke="#00D4AA" stroke-width="0.3" stroke-opacity="0.2"/>
+  </g>
+</svg>

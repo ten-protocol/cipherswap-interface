@@ -1,0 +1,27 @@
+<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="asteroidGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a3a"/>
+      <stop offset="50%" stop-color="#1a1a24"/>
+      <stop offset="100%" stop-color="#0f0f15"/>
+    </linearGradient>
+    <filter id="asteroidGlow1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feFlood flood-color="#00D4AA" flood-opacity="0.3"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path d="M60 5 L95 20 L110 50 L100 80 L70 95 L30 90 L10 60 L15 30 L40 10 Z"
+        fill="url(#asteroidGrad1)"
+        stroke="#00D4AA"
+        stroke-width="0.5"
+        stroke-opacity="0.3"
+        filter="url(#asteroidGlow1)"/>
+  <path d="M45 25 L55 30 L50 40 L40 35 Z" fill="#0f0f15" opacity="0.5"/>
+  <path d="M70 50 L85 55 L80 70 L65 65 Z" fill="#0f0f15" opacity="0.4"/>
+  <path d="M30 60 L40 65 L35 75 Z" fill="#0f0f15" opacity="0.3"/>
+</svg>
