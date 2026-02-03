@@ -53,7 +53,7 @@ function pairKey(token0Address: string, token1Address: string) {
 }
 
 export const initialState: UserState = {
-  userDarkMode: null,
+  userDarkMode: true, // CipherSwap defaults to dark mode
   matchesDarkMode: false,
   userExpertMode: false,
   userSlippageTolerance: INITIAL_ALLOWED_SLIPPAGE,
@@ -76,6 +76,11 @@ export default createReducer(initialState, builder =>
       // noinspection SuspiciousTypeOfGuard
       if (typeof state.userDeadline !== 'number') {
         state.userDeadline = DEFAULT_DEADLINE_FROM_NOW
+      }
+
+      // CipherSwap rebrand: default to dark mode for users who haven't explicitly chosen
+      if (state.userDarkMode === null) {
+        state.userDarkMode = true
       }
 
       state.lastUpdateVersionTimestamp = currentTimestamp()
