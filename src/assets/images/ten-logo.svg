@@ -1,0 +1,12 @@
+<svg viewBox="0 0 48 20" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="2" width="12" height="2" fill="currentColor"/>
+  <rect x="5" y="2" width="2" height="16" fill="currentColor"/>
+  <rect x="16" y="2" width="10" height="2" fill="currentColor"/>
+  <rect x="16" y="9" width="8" height="2" fill="currentColor"/>
+  <rect x="16" y="16" width="10" height="2" fill="currentColor"/>
+  <rect x="16" y="2" width="2" height="16" fill="currentColor"/>
+  <rect x="30" y="2" width="2" height="16" fill="currentColor"/>
+  <rect x="30" y="2" width="10" height="2" fill="currentColor"/>
+  <rect x="40" y="2" width="2" height="16" fill="currentColor"/>
+  <path d="M32 9 L38 4 L38 14 Z" fill="currentColor"/>
+</svg>

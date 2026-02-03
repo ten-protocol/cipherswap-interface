@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { ChainId } from '../../sdk'
 import Logo from '../../assets/images/logo.svg'
 import WordmarkLogo from '../../assets/images/wordmark-logo.svg'
+import TenLogo from '../../assets/images/ten-logo.svg'
 import { useActiveWeb3React } from '../../hooks'
 import { useDarkModeManager } from '../../state/user/hooks'
 import { useETHBalances } from '../../state/wallet/hooks'
@@ -96,9 +97,34 @@ const UniIcon = styled.div`
     transform: rotate(-5deg);
   }
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    img { 
+    img {
       width: 4.5rem;
     }
+  `};
+`
+
+const PoweredByBadge = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: ${({ theme }) => theme.text3};
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  margin-left: 12px;
+
+  :hover {
+    opacity: 1;
+  }
+
+  img {
+    height: 12px;
+    width: auto;
+  }
+
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    display: none;
   `};
 `
 
@@ -144,6 +170,10 @@ export default function Header() {
               </TitleText>
             )}
           </Title>
+          <PoweredByBadge href="https://ten.xyz" target="_blank" rel="noopener noreferrer">
+            <span>Powered by</span>
+            <img src={TenLogo} alt="TEN" />
+          </PoweredByBadge>
         </HeaderElement>
         <HeaderControls>
           <HeaderElement>
