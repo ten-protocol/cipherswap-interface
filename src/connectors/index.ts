@@ -23,9 +23,10 @@ export const injected = new InjectedConnector({
  * Call this when wallet connection fails due to wrong chain.
  */
 export async function addTenTestnetToMetaMask(): Promise<void> {
-  if (!window.ethereum || !window.ethereum.request) return
+  const ethereum = window.ethereum as { request?: (...args: any[]) => Promise<any> } | undefined
+  if (!ethereum?.request) return
   try {
-    await window.ethereum.request({
+    await ethereum.request({
       method: 'wallet_addEthereumChain',
       params: [
         {
