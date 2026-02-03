@@ -79,9 +79,9 @@ const OptionCustom = styled(FancyButton)<{ active?: boolean; warning?: boolean }
 `
 
 const SlippageEmojiContainer = styled.span`
-  color: #f3841e;
+  color: ${({ theme }) => theme.yellow2};
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    display: none;  
+    display: none;
   `}
 `
 
@@ -211,7 +211,7 @@ export default function SlippageTabs({ rawSlippage, setRawSlippage, deadline, se
             style={{
               fontSize: '14px',
               paddingTop: '7px',
-              color: slippageError === SlippageError.InvalidInput ? 'red' : '#F3841E'
+              color: slippageError === SlippageError.InvalidInput ? theme.red1 : theme.yellow2
             }}
           >
             {slippageError === SlippageError.InvalidInput

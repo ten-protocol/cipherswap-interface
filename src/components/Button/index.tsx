@@ -199,19 +199,18 @@ export const ButtonEmpty = styled(Base)`
 `
 
 export const ButtonWhite = styled(Base)`
-  border: 1px solid #edeef2;
+  border: 1px solid ${({ theme }) => theme.text5};
   background-color: ${({ theme }) => theme.bg1};
-  color: black;
+  color: ${({ theme }) => theme.text1};
 
   &:focus {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    box-shadow: 0 0 0 1pt ${darken(0.05, '#edeef2')};
+    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.text5)};
   }
   &:hover {
-    box-shadow: 0 0 0 1pt ${darken(0.1, '#edeef2')};
+    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.text5)};
   }
   &:active {
-    box-shadow: 0 0 0 1pt ${darken(0.1, '#edeef2')};
+    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.text5)};
   }
   &:disabled {
     opacity: 50%;

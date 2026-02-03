@@ -38,6 +38,8 @@ const CustomLightSpinner = styled(Spinner)<{ size: string }>`
 `
 
 function ConfirmationPendingContent({ onDismiss, pendingText }: { onDismiss: () => void; pendingText: string }) {
+  const theme = useContext(ThemeContext)
+
   return (
     <Wrapper>
       <Section>
@@ -57,7 +59,7 @@ function ConfirmationPendingContent({ onDismiss, pendingText }: { onDismiss: () 
               {pendingText}
             </Text>
           </AutoColumn>
-          <Text fontSize={12} color="#565A69" textAlign="center">
+          <Text fontSize={12} color={theme.text4} textAlign="center">
             Confirm this transaction in your wallet
           </Text>
         </AutoColumn>

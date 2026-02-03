@@ -73,7 +73,7 @@ const AccountElement = styled.div<{ active: boolean }>`
   width: 100%;
 
   :focus {
-    border: 1px solid blue;
+    border: 1px solid ${({ theme }) => theme.primary1};
   }
 `
 
