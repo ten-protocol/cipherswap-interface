@@ -43,44 +43,44 @@ export function colors(darkMode: boolean): Colors {
     black,
 
     // text
-    text1: darkMode ? '#FFFFFF' : '#080f2b',
-    text2: darkMode ? '#FFFFFF' : '#080f2b',
+    text1: darkMode ? '#FFFFFF' : '#0A0A0F',
+    text2: darkMode ? '#FFFFFF' : '#0A0A0F',
     text3: darkMode ? '#6C7284' : '#888D9B',
     text4: darkMode ? '#565A69' : '#C3C5CB',
     text5: darkMode ? '#2C2F36' : '#EDEEF2',
 
     // backgrounds / greys
-    bg1: darkMode ? '#080f2b' : '#FFFFFF',
-    bg2: darkMode ? '#31374F' : '#E7E9F1',
-    bg3: darkMode ? '#31374F' : '#E7E9F1',
-    bg4: darkMode ? '#31374F' : '#E7E9F1',
-    bg5: darkMode ? '#31374F' : '#FFFFFF',
+    bg1: darkMode ? '#0A0A0F' : '#FFFFFF',
+    bg2: darkMode ? '#1A1A24' : '#E7E9F1',
+    bg3: darkMode ? '#1A1A24' : '#E7E9F1',
+    bg4: darkMode ? '#1A1A24' : '#E7E9F1',
+    bg5: darkMode ? '#1A1A24' : '#FFFFFF',
 
     //specialty colors
     modalBG: darkMode ? 'rgba(0,0,0,.425)' : 'rgba(0,0,0,0.3)',
     advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#FFA300' : '#FFA300',
-    primary2: darkMode ? '#FFA300' : '#FFA300',
-    primary3: darkMode ? '#FFA300' : '#FFA300',
-    primary4: darkMode ? '#FFA300' : '#080f2b',
-    primary5: darkMode ? 'rgba(255,255,255,0.1)' : '#FFFFFF',
+    primary1: darkMode ? '#00D4AA' : '#00D4AA',
+    primary2: darkMode ? '#00D4AA' : '#00D4AA',
+    primary3: darkMode ? '#00D4AA' : '#00D4AA',
+    primary4: darkMode ? '#00D4AA' : '#0A0A0F',
+    primary5: darkMode ? 'rgba(0,212,170,0.1)' : '#FFFFFF',
 
     // color text
-    primaryText1: darkMode ? '#FFFFFF' : '#FFA300',
+    primaryText1: darkMode ? '#FFFFFF' : '#00D4AA',
 
     // secondary colors
-    secondary1: darkMode ? '#080f2b' : '#FFA300',
-    secondary2: darkMode ? '#080f2b' : '#FFA300',
-    secondary3: darkMode ? '#080f2b' : '#FFA300',
+    secondary1: darkMode ? '#0A0A0F' : '#00D4AA',
+    secondary2: darkMode ? '#0A0A0F' : '#00D4AA',
+    secondary3: darkMode ? '#0A0A0F' : '#00D4AA',
 
     // other
     red1: '#FF6871',
     red2: '#F82D3A',
     green1: '#27AE60',
     yellow1: '#FFFFFF',
-    yellow2: '#FFA300'
+    yellow2: '#00D4AA'
   }
 }
 
