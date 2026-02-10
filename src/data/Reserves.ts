@@ -3,7 +3,9 @@ import { Interface } from '@ethersproject/abi'
 
 import { TokenAmount, Pair, Currency } from '../sdk'
 import { useActiveWeb3React } from '../hooks'
-import { abi as IUniswapV2PairABI } from '../constants/abis/IUniswapV2Pair.json'
+import IUniswapV2PairJSON from '../constants/abis/IUniswapV2Pair.json'
+
+const IUniswapV2PairABI = IUniswapV2PairJSON.abi
 import { useMultipleContractSingleData } from '../state/multicall/hooks'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
 

@@ -2,7 +2,9 @@ import { Contract } from '@ethersproject/contracts'
 import { useMemo } from 'react'
 
 import { WETH } from '../sdk'
-import { abi as IUniswapV2PairABI } from '../constants/abis/IUniswapV2Pair.json'
+import IUniswapV2PairJSON from '../constants/abis/IUniswapV2Pair.json'
+
+const IUniswapV2PairABI = IUniswapV2PairJSON.abi
 import { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_ABI from '../constants/abis/erc20.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'

@@ -3,7 +3,9 @@ import { getAddress } from '@ethersproject/address'
 import { AddressZero } from '@ethersproject/constants'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { BigNumber } from '@ethersproject/bignumber'
-import { abi as IUniswapV2Router02ABI } from '../constants/abis/IUniswapV2Router02.json'
+import IUniswapV2Router02JSON from '../constants/abis/IUniswapV2Router02.json'
+
+const IUniswapV2Router02ABI = IUniswapV2Router02JSON.abi
 import { ROUTER_ADDRESS } from '../constants'
 import { ChainId, JSBI, Percent, CurrencyAmount } from '../sdk'
 

@@ -3,15 +3,27 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ChainId, JSBI, Percent, Token } from '../sdk'
 import { injected } from '../connectors'
 
-export const ROUTER_ADDRESS = '0x9cF6C659F173916f4928420E72DE53E667DbDf73'
+export const ROUTER_ADDRESS = process.env.REACT_APP_ROUTER_ADDRESS || '0x9cF6C659F173916f4928420E72DE53E667DbDf73'
 
 // a list of tokens by chain
 type ChainTokenList = {
   readonly [chainId in ChainId]: Token[]
 }
 
-export const ALPHA = new Token(ChainId.TEN_TESTNET, '0x910c2a26649063a37fc507EC827fF7f6784133a1', 18, 'ALPHA', 'Alpha Token')
-export const BETA = new Token(ChainId.TEN_TESTNET, '0xD3C60e71391b8F481222546c80F046a73AA4611f', 18, 'BETA', 'Beta Token')
+export const ALPHA = new Token(
+  ChainId.TEN_TESTNET,
+  process.env.REACT_APP_ALPHA_TOKEN_ADDRESS || '0x910c2a26649063a37fc507EC827fF7f6784133a1',
+  18,
+  'ALPHA',
+  'Alpha Token'
+)
+export const BETA = new Token(
+  ChainId.TEN_TESTNET,
+  process.env.REACT_APP_BETA_TOKEN_ADDRESS || '0xD3C60e71391b8F481222546c80F046a73AA4611f',
+  18,
+  'BETA',
+  'Beta Token'
+)
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {

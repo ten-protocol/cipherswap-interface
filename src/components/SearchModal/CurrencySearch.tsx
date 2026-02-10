@@ -47,7 +47,7 @@ export function CurrencySearch({
   const searchToken = useToken(searchQuery)
 
   // ETH/native currency disabled -- TEN testnet uses token-to-token swaps only
-  const showETH: boolean = false
+  const showETH = false
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
@@ -148,7 +148,7 @@ export function CurrencySearch({
 
       <div style={{ flex: '1' }}>
         <AutoSizer disableWidth>
-          {({ height }) => (
+          {({ height }: { height: number }) => (
             <CurrencyList
               height={height}
               showETH={showETH}

@@ -266,20 +266,120 @@ export default function AnimatedBackground() {
       <OrbImage src={tenOrb} alt="" className="bottom-left" />
 
       {/* Flying across screen - dramatic movement */}
-      <FloatingElement src={crystal1} alt="" className="fly1" $size={70} $top="0" $left="0" $delay={0} $duration={25} $opacity={0.7} />
-      <FloatingElement src={crystal2} alt="" className="fly2" $size={55} $top="0" $left="0" $delay={-8} $duration={30} $opacity={0.6} />
-      <FloatingElement src={asteroid1} alt="" className="fly3" $size={60} $top="0" $left="0" $delay={-15} $duration={35} $opacity={0.5} />
-      <FloatingElement src={crystal1} alt="" className="fly1" $size={45} $top="20%" $left="0" $delay={-12} $duration={28} $opacity={0.5} />
-      <FloatingElement src={asteroid2} alt="" className="fly2" $size={50} $top="0" $left="0" $delay={-20} $duration={32} $opacity={0.4} />
+      <FloatingElement
+        src={crystal1}
+        alt=""
+        className="fly1"
+        $size={70}
+        $top="0"
+        $left="0"
+        $delay={0}
+        $duration={25}
+        $opacity={0.7}
+      />
+      <FloatingElement
+        src={crystal2}
+        alt=""
+        className="fly2"
+        $size={55}
+        $top="0"
+        $left="0"
+        $delay={-8}
+        $duration={30}
+        $opacity={0.6}
+      />
+      <FloatingElement
+        src={asteroid1}
+        alt=""
+        className="fly3"
+        $size={60}
+        $top="0"
+        $left="0"
+        $delay={-15}
+        $duration={35}
+        $opacity={0.5}
+      />
+      <FloatingElement
+        src={crystal1}
+        alt=""
+        className="fly1"
+        $size={45}
+        $top="20%"
+        $left="0"
+        $delay={-12}
+        $duration={28}
+        $opacity={0.5}
+      />
+      <FloatingElement
+        src={asteroid2}
+        alt=""
+        className="fly2"
+        $size={50}
+        $top="0"
+        $left="0"
+        $delay={-20}
+        $duration={32}
+        $opacity={0.4}
+      />
 
       {/* Orbiting elements - circular paths with spin */}
-      <FloatingElement src={crystal2} alt="" className="orbit1" $size={60} $top="15%" $left="10%" $delay={0} $duration={40} $opacity={0.6} />
-      <FloatingElement src={crystal1} alt="" className="orbit2" $size={50} $bottom="20%" $right="15%" $delay={-10} $duration={35} $opacity={0.5} />
-      <FloatingElement src={asteroid1} alt="" className="orbit1" $size={45} $top="50%" $right="5%" $delay={-20} $duration={45} $opacity={0.4} />
+      <FloatingElement
+        src={crystal2}
+        alt=""
+        className="orbit1"
+        $size={60}
+        $top="15%"
+        $left="10%"
+        $delay={0}
+        $duration={40}
+        $opacity={0.6}
+      />
+      <FloatingElement
+        src={crystal1}
+        alt=""
+        className="orbit2"
+        $size={50}
+        $bottom="20%"
+        $right="15%"
+        $delay={-10}
+        $duration={35}
+        $opacity={0.5}
+      />
+      <FloatingElement
+        src={asteroid1}
+        alt=""
+        className="orbit1"
+        $size={45}
+        $top="50%"
+        $right="5%"
+        $delay={-20}
+        $duration={45}
+        $opacity={0.4}
+      />
 
       {/* Gentle floating spinners - ambient movement */}
-      <FloatingElement src={crystal2} alt="" className="floatSpin" $size={40} $top="30%" $right="25%" $delay={-5} $duration={20} $opacity={0.5} />
-      <FloatingElement src={asteroid2} alt="" className="floatSpin" $size={35} $bottom="40%" $left="20%" $delay={-12} $duration={25} $opacity={0.4} />
+      <FloatingElement
+        src={crystal2}
+        alt=""
+        className="floatSpin"
+        $size={40}
+        $top="30%"
+        $right="25%"
+        $delay={-5}
+        $duration={20}
+        $opacity={0.5}
+      />
+      <FloatingElement
+        src={asteroid2}
+        alt=""
+        className="floatSpin"
+        $size={35}
+        $bottom="40%"
+        $left="20%"
+        $delay={-12}
+        $duration={25}
+        $opacity={0.4}
+      />
     </BackgroundWrapper>
   )
 }

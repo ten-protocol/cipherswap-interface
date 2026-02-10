@@ -13,7 +13,6 @@ import { AppDispatch, AppState } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, switchCurrencies, typeInput } from './actions'
 import { SwapState } from './reducer'
-import useToggledVersion from '../../hooks/useToggledVersion'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 
@@ -105,8 +104,6 @@ export function useDerivedSwapInfo(): {
 } {
   const { account } = useActiveWeb3React()
 
-  const toggledVersion = useToggledVersion()
-
   const {
     independentField,
     typedValue,
@@ -174,11 +171,11 @@ export function useDerivedSwapInfo(): {
   // compare input balance to max input based on version
   const [balanceIn, amountIn] = [
     currencyBalances[Field.INPUT],
-    toggledVersion === slippageAdjustedAmounts ? slippageAdjustedAmounts[Field.INPUT] : null
+    slippageAdjustedAmounts ? slippageAdjustedAmounts[Field.INPUT] : null
   ]
 
   if (balanceIn && amountIn && balanceIn.lessThan(amountIn)) {
-    inputError = 'Insufficient ' + amountIn.currency.symbol + ' balance'
+    inputError = 'Insufficient ' + (amountIn as CurrencyAmount).currency.symbol + ' balance'
   }
 
   return {
@@ -191,7 +188,7 @@ export function useDerivedSwapInfo(): {
 }
 
 // Default to ALPHA token address instead of ETH (no native currency on TEN testnet)
-const DEFAULT_CURRENCY = '0x910c2a26649063a37fc507EC827fF7f6784133a1'
+const DEFAULT_CURRENCY = process.env.REACT_APP_ALPHA_TOKEN_ADDRESS || '0x910c2a26649063a37fc507EC827fF7f6784133a1'
 
 function parseCurrencyFromURLParameter(urlParam: any): string {
   if (typeof urlParam === 'string') {
