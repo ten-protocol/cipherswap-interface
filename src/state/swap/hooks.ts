@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Currency, CurrencyAmount, ETHER, JSBI, Token, TokenAmount, Trade } from '../../sdk'
 import { useActiveWeb3React } from '../../hooks'
-import { useCurrency } from '../../hooks/Tokens'
+import { ETH_ADDRESS, useCurrency } from '../../hooks/Tokens'
 import { useTradeExactIn, useTradeExactOut } from '../../hooks/Trades'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
@@ -31,7 +31,7 @@ export function useSwapActionHandlers(): {
       dispatch(
         selectCurrency({
           field,
-          currencyId: currency instanceof Token ? currency.address : currency === ETHER ? 'ETH' : ''
+          currencyId: currency instanceof Token ? currency.address : currency === ETHER ? ETH_ADDRESS : ''
         })
       )
     },
@@ -187,17 +187,14 @@ export function useDerivedSwapInfo(): {
   }
 }
 
-// Default to ALPHA token address instead of ETH (no native currency on TEN testnet)
-const DEFAULT_CURRENCY = process.env.REACT_APP_ALPHA_TOKEN_ADDRESS || '0x910c2a26649063a37fc507EC827fF7f6784133a1'
-
 function parseCurrencyFromURLParameter(urlParam: any): string {
   if (typeof urlParam === 'string') {
     const valid = isAddress(urlParam)
     if (valid) return valid
-    if (urlParam.toUpperCase() === 'ETH') return DEFAULT_CURRENCY
-    if (valid === false) return DEFAULT_CURRENCY
+    if (urlParam.toUpperCase() === 'ETH') return ETH_ADDRESS
+    if (valid === false) return ETH_ADDRESS
   }
-  return DEFAULT_CURRENCY ?? ''
+  return ETH_ADDRESS
 }
 
 function parseTokenAmountURLParameter(urlParam: any): string {

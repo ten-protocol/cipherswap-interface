@@ -9,6 +9,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { useAllTokens } from '../../hooks/Tokens'
 import { AppDispatch, AppState } from '../index'
 import {
+  acknowledgeToken,
   addSerializedPair,
   addSerializedToken,
   removeSerializedToken,
@@ -141,6 +142,32 @@ export function useUserAddedTokens(): Token[] {
     if (!chainId) return []
     return Object.values(serializedTokensMap[chainId as ChainId] ?? {}).map(deserializeToken)
   }, [serializedTokensMap, chainId])
+}
+
+export function useAcknowledgedTokens(): { [address: string]: true } {
+  const { chainId } = useActiveWeb3React()
+  const acknowledgedTokensMap = useSelector<AppState, AppState['user']['acknowledgedTokens']>(
+    ({ user: { acknowledgedTokens } }) => acknowledgedTokens
+  )
+
+  return useMemo(() => {
+    if (!chainId || !acknowledgedTokensMap) return {}
+    return acknowledgedTokensMap[chainId as ChainId] ?? {}
+  }, [acknowledgedTokensMap, chainId])
+}
+
+export function useAcknowledgeTokens(): (tokens: Token[]) => void {
+  const { chainId } = useActiveWeb3React()
+  const dispatch = useDispatch<AppDispatch>()
+  return useCallback(
+    (tokens: Token[]) => {
+      if (!chainId) return
+      tokens.forEach(token => {
+        dispatch(acknowledgeToken({ chainId, address: token.address }))
+      })
+    },
+    [dispatch, chainId]
+  )
 }
 
 function serializePair(pair: Pair): SerializedPair {

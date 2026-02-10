@@ -100,8 +100,16 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
   ])
 }
 
+// Standard placeholder address for native ETH
+export const ETH_ADDRESS = '0xEeeEEEEEEEEEEEEEEEEEEEEEEEeeeEeeeEeEeeE'
+
+function isETHIdentifier(currencyId: string | undefined): boolean {
+  if (!currencyId) return false
+  return currencyId.toUpperCase() === 'ETH' || currencyId.toLowerCase() === ETH_ADDRESS.toLowerCase()
+}
+
 export function useCurrency(currencyId: string | undefined): Currency | null | undefined {
-  const isETH = currencyId?.toUpperCase() === 'ETH'
+  const isETH = isETHIdentifier(currencyId)
   const token = useToken(isETH ? undefined : currencyId)
   return isETH ? ETHER : token
 }
