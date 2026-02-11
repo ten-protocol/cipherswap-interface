@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { useAccount, useConnect } from 'wagmi'
+import { useAccount, useConnect, Connector } from 'wagmi'
 import usePrevious from '../../hooks/usePrevious'
 import { useWalletModalOpen, useWalletModalToggle } from '../../state/application/hooks'
 
@@ -117,6 +117,22 @@ const OptionButton = styled.button`
   }
 `
 
+function ConnectorIcon({ connector }: { connector: Connector }) {
+  const [iconUrl, setIconUrl] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (connector.icon) {
+      setIconUrl(connector.icon)
+    } else if (typeof connector.getProvider === 'function') {
+      connector.getProvider().then((provider: any) => {
+        if (provider?.icon) setIconUrl(provider.icon)
+      }).catch(() => {})
+    }
+  }, [connector])
+
+  return <img src={iconUrl || MetamaskIcon} alt={connector.name} />
+}
+
 const WALLET_VIEWS = {
   OPTIONS: 'options',
   ACCOUNT: 'account'
@@ -159,7 +175,7 @@ export default function WalletModal({
   function getOptions() {
     return uniqueConnectors.map(connector => (
       <OptionButton key={connector.uid} onClick={() => connect({ connector })} disabled={isPending}>
-        <img src={MetamaskIcon} alt={connector.name} />
+        <ConnectorIcon connector={connector} />
         <span>{connector.name === 'Injected' ? 'Browser Wallet' : connector.name}</span>
         {isPending && <Loader />}
       </OptionButton>
