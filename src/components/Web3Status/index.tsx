@@ -105,7 +105,7 @@ function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
 }
 
 function Web3StatusInner() {
-  const { address: account, isConnected, chain } = useAccount()
+  const { address: account, isConnected, chain, connector } = useAccount()
 
   const allTransactions = useAllTransactions()
 
@@ -124,9 +124,21 @@ function Web3StatusInner() {
   if (isConnected && account) {
     if (isWrongChain) {
       return (
-        <Web3StatusError onClick={toggleWalletModal}>
+        <Web3StatusError
+          onClick={async () => {
+            try {
+              const provider = await connector?.getProvider()
+              await (provider as any)?.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: `0x${TEN_CHAIN_ID.toString(16)}` }]
+              })
+            } catch {
+              window.open('https://testnet.ten.xyz/', '_blank', 'noopener,noreferrer')
+            }
+          }}
+        >
           <NetworkIcon />
-          <Text>Wrong Network</Text>
+          <Text>Switch to TEN</Text>
         </Web3StatusError>
       )
     }
