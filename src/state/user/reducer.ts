@@ -2,6 +2,7 @@ import { INITIAL_ALLOWED_SLIPPAGE, DEFAULT_DEADLINE_FROM_NOW } from '../../const
 import { createReducer } from '@reduxjs/toolkit'
 import { updateVersion } from '../global/actions'
 import {
+  acknowledgeToken,
   addSerializedPair,
   addSerializedToken,
   removeSerializedPair,
@@ -45,6 +46,13 @@ export interface UserState {
     }
   }
 
+  // tokens the user has already seen the warning modal for
+  acknowledgedTokens: {
+    [chainId: number]: {
+      [address: string]: true
+    }
+  }
+
   timestamp: number
 }
 
@@ -60,6 +68,7 @@ export const initialState: UserState = {
   userDeadline: DEFAULT_DEADLINE_FROM_NOW,
   tokens: {},
   pairs: {},
+  acknowledgedTokens: {},
   timestamp: currentTimestamp()
 }
 
@@ -81,6 +90,11 @@ export default createReducer(initialState, builder =>
       // CipherSwap rebrand: default to dark mode for users who haven't explicitly chosen
       if (state.userDarkMode === null) {
         state.userDarkMode = true
+      }
+
+      // ensure acknowledgedTokens exists for persisted states
+      if (!state.acknowledgedTokens) {
+        state.acknowledgedTokens = {}
       }
 
       state.lastUpdateVersionTimestamp = currentTimestamp()
@@ -132,6 +146,11 @@ export default createReducer(initialState, builder =>
         delete state.pairs[chainId][pairKey(tokenAAddress, tokenBAddress)]
         delete state.pairs[chainId][pairKey(tokenBAddress, tokenAAddress)]
       }
+      state.timestamp = currentTimestamp()
+    })
+    .addCase(acknowledgeToken, (state, { payload: { chainId, address } }) => {
+      state.acknowledgedTokens[chainId] = state.acknowledgedTokens[chainId] || {}
+      state.acknowledgedTokens[chainId][address] = true
       state.timestamp = currentTimestamp()
     })
 )

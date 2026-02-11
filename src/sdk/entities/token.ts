@@ -59,7 +59,7 @@ export function currencyEquals(currencyA: Currency, currencyB: Currency): boolea
 export const WETH = {
   [ChainId.TEN_TESTNET]: new Token(
     ChainId.TEN_TESTNET,
-    '0x0000000000000000000000000000000000000001',
+    process.env.REACT_APP_WETH_ADDRESS || '0x0000000000000000000000000000000000000001',
     18,
     'WETH',
     'Wrapped Ether'

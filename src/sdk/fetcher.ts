@@ -9,10 +9,13 @@ import IUniswapV2Pair from './abis/IUniswapV2Pair.json'
 import { ChainId } from './constants'
 import { Token } from './entities/token'
 
+const ALPHA_ADDRESS = process.env.REACT_APP_ALPHA_TOKEN_ADDRESS || '0x910c2a26649063a37fc507EC827fF7f6784133a1'
+const BETA_ADDRESS = process.env.REACT_APP_BETA_TOKEN_ADDRESS || '0xD3C60e71391b8F481222546c80F046a73AA4611f'
+
 let TOKEN_DECIMALS_CACHE: { [chainId: number]: { [address: string]: number } } = {
   [ChainId.TEN_TESTNET]: {
-    '0x910c2a26649063a37fc507EC827fF7f6784133a1': 18, // ALPHA
-    '0xD3C60e71391b8F481222546c80F046a73AA4611f': 18  // BETA
+    [ALPHA_ADDRESS]: 18, // ALPHA
+    [BETA_ADDRESS]: 18   // BETA
   }
 }
 

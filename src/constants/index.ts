@@ -1,21 +1,30 @@
-import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ChainId, JSBI, Percent, Token, WETH } from '../sdk'
 
-import { ChainId, JSBI, Percent, Token } from '../sdk'
-import { injected } from '../connectors'
-
-export const ROUTER_ADDRESS = '0x9cF6C659F173916f4928420E72DE53E667DbDf73'
+export const ROUTER_ADDRESS = process.env.REACT_APP_ROUTER_ADDRESS || '0x9cF6C659F173916f4928420E72DE53E667DbDf73'
 
 // a list of tokens by chain
 type ChainTokenList = {
   readonly [chainId in ChainId]: Token[]
 }
 
-export const ALPHA = new Token(ChainId.TEN_TESTNET, '0x910c2a26649063a37fc507EC827fF7f6784133a1', 18, 'ALPHA', 'Alpha Token')
-export const BETA = new Token(ChainId.TEN_TESTNET, '0xD3C60e71391b8F481222546c80F046a73AA4611f', 18, 'BETA', 'Beta Token')
+export const ALPHA = new Token(
+  ChainId.TEN_TESTNET,
+  process.env.REACT_APP_ALPHA_TOKEN_ADDRESS || '0x910c2a26649063a37fc507EC827fF7f6784133a1',
+  18,
+  'ALPHA',
+  'Alpha Token'
+)
+export const BETA = new Token(
+  ChainId.TEN_TESTNET,
+  process.env.REACT_APP_BETA_TOKEN_ADDRESS || '0xD3C60e71391b8F481222546c80F046a73AA4611f',
+  18,
+  'BETA',
+  'Beta Token'
+)
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  [ChainId.TEN_TESTNET]: [ALPHA, BETA]
+  [ChainId.TEN_TESTNET]: [WETH[ChainId.TEN_TESTNET], ALPHA, BETA]
 }
 
 /**
@@ -26,12 +35,12 @@ export const CUSTOM_BASES: { [chainId in ChainId]?: { [tokenAddress: string]: To
 
 // used for display in the default list when adding liquidity
 export const SUGGESTED_BASES: ChainTokenList = {
-  [ChainId.TEN_TESTNET]: [ALPHA, BETA]
+  [ChainId.TEN_TESTNET]: [WETH[ChainId.TEN_TESTNET], ALPHA, BETA]
 }
 
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
-  [ChainId.TEN_TESTNET]: [ALPHA, BETA]
+  [ChainId.TEN_TESTNET]: [WETH[ChainId.TEN_TESTNET], ALPHA, BETA]
 }
 
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {
@@ -39,7 +48,6 @@ export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } 
 }
 
 export interface WalletInfo {
-  connector?: AbstractConnector
   name: string
   iconName: string
   description: string
@@ -52,7 +60,6 @@ export interface WalletInfo {
 
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   METAMASK: {
-    connector: injected,
     name: 'MetaMask',
     iconName: 'metamask.png',
     description: 'Easy-to-use browser extension.',
@@ -60,8 +67,6 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     color: '#E8831D'
   }
 }
-
-export const NetworkContextName = 'NETWORK'
 
 // default allowed slippage, in bips
 export const INITIAL_ALLOWED_SLIPPAGE = 50

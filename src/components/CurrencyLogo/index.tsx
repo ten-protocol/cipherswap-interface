@@ -39,6 +39,8 @@ export default function CurrencyLogo({
 
   if (currency === ETHER) {
     return <StyledEthereumLogo src={EthereumLogo} size={size} style={style} />
+  } else if (currency?.symbol === 'WETH') {
+    return <StyledEthereumLogo src={EthereumLogo} size={size} style={style} />
   }
 
   return <StyledLogo size={size} srcs={srcs} alt={`${currency?.symbol ?? 'token'} logo`} style={style} />

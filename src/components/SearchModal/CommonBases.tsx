@@ -2,7 +2,7 @@ import React from 'react'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
-import { ChainId, Currency, Token } from '../../sdk'
+import { ChainId, Currency, currencyEquals, ETHER, Token } from '../../sdk'
 import { SUGGESTED_BASES } from '../../constants'
 import { AutoColumn } from '../Column'
 import { AutoRow } from '../Row'
@@ -40,10 +40,22 @@ export default function CommonBases({
     <AutoColumn gap="md">
       <AutoRow>
         <Text fontWeight={500} fontSize={14}>
-          Metalamp bases
+          Common bases
         </Text>
       </AutoRow>
       <AutoRow gap="4px">
+        <BaseWrapper
+          onClick={() => {
+            if (selectedCurrency && currencyEquals(selectedCurrency, ETHER)) return
+            onSelect(ETHER)
+          }}
+          disable={selectedCurrency === ETHER}
+        >
+          <CurrencyLogo currency={ETHER} style={{ marginRight: 8 }} />
+          <Text fontWeight={500} fontSize={16}>
+            ETH
+          </Text>
+        </BaseWrapper>
         {(chainId ? SUGGESTED_BASES[chainId] : []).map((token: Token) => {
           const selected = selectedCurrency instanceof Token && selectedCurrency.address === token.address
           return (

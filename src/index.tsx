@@ -1,8 +1,9 @@
-import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
 import React, { StrictMode } from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
-import { NetworkContextName } from './constants'
+import { WagmiProvider } from 'wagmi'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { wagmiConfig } from './lib/wagmiConfig'
 import App from './pages/App'
 import store from './state'
 import ApplicationUpdater from './state/application/updater'
@@ -10,9 +11,8 @@ import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
 import UserUpdater from './state/user/updater'
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
-import getLibrary from './utils/getLibrary'
 
-const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
+const queryClient = new QueryClient()
 
 if ('ethereum' in window) {
   ;(window.ethereum as any).autoRefreshOnNetworkChange = false
@@ -23,17 +23,18 @@ function Updaters() {
     <>
       <UserUpdater />
       <ApplicationUpdater />
-      <TransactionUpdater />
       <MulticallUpdater />
+      <TransactionUpdater />
     </>
   )
 }
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!)
+root.render(
   <StrictMode>
     <FixedGlobalStyle />
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <Web3ProviderNetwork getLibrary={getLibrary}>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
         <Provider store={store}>
           <Updaters />
           <ThemeProvider>
@@ -41,8 +42,7 @@ ReactDOM.render(
             <App />
           </ThemeProvider>
         </Provider>
-      </Web3ProviderNetwork>
-    </Web3ReactProvider>
-  </StrictMode>,
-  document.getElementById('root')
+      </QueryClientProvider>
+    </WagmiProvider>
+  </StrictMode>
 )

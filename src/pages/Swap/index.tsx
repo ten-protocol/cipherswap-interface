@@ -1,9 +1,10 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import { ArrowDown } from 'react-feather'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 
-import { CurrencyAmount, JSBI, Token, Trade } from '../../sdk'
+import { Currency, CurrencyAmount, ETHER, JSBI, Token, Trade } from '../../sdk'
 import { ButtonError, ButtonLight, ButtonPrimary, ButtonConfirmed } from '../../components/Button'
 import Card, { GreyCard } from '../../components/Card'
 import { AutoColumn } from '../../components/Column'
@@ -20,7 +21,7 @@ import ProgressSteps from '../../components/ProgressSteps'
 
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
-import { useCurrency } from '../../hooks/Tokens'
+import { ETH_ADDRESS, useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
 import { useSwapCallback } from '../../hooks/useSwapCallback'
 import useToggledVersion, { Version } from '../../hooks/useToggledVersion'
@@ -33,7 +34,13 @@ import {
   useSwapActionHandlers,
   useSwapState
 } from '../../state/swap/hooks'
-import { useExpertModeManager, useUserDeadline, useUserSlippageTolerance } from '../../state/user/hooks'
+import {
+  useAcknowledgedTokens,
+  useAcknowledgeTokens,
+  useExpertModeManager,
+  useUserDeadline,
+  useUserSlippageTolerance
+} from '../../state/user/hooks'
 import { TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
@@ -49,17 +56,22 @@ export default function Swap() {
     useCurrency(loadedUrlParams?.inputCurrencyId),
     useCurrency(loadedUrlParams?.outputCurrencyId)
   ]
-  const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
+  const acknowledgedTokens = useAcknowledgedTokens()
+  const acknowledgeTokens = useAcknowledgeTokens()
   const urlLoadedTokens: Token[] = useMemo(
-    () => [loadedInputCurrency, loadedOutputCurrency]?.filter((c): c is Token => c instanceof Token) ?? [],
-    [loadedInputCurrency, loadedOutputCurrency]
+    () =>
+      [loadedInputCurrency, loadedOutputCurrency]?.filter(
+        (c): c is Token => c instanceof Token && !acknowledgedTokens[c.address]
+      ) ?? [],
+    [loadedInputCurrency, loadedOutputCurrency, acknowledgedTokens]
   )
   const handleConfirmTokenWarning = useCallback(() => {
-    setDismissTokenWarning(true)
-  }, [])
+    acknowledgeTokens(urlLoadedTokens)
+  }, [acknowledgeTokens, urlLoadedTokens])
 
   const { account } = useActiveWeb3React()
   const theme = useContext(ThemeContext)
+  const history = useHistory()
 
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
@@ -99,6 +111,23 @@ export default function Swap() {
       }
 
   const { onSwitchTokens, onCurrencySelection, onUserInput } = useSwapActionHandlers()
+
+  // helper: get currency ID for URL params
+  const currencyToId = useCallback((currency: Currency): string => {
+    return currency instanceof Token ? currency.address : currency === ETHER ? ETH_ADDRESS : ''
+  }, [])
+
+  // helper: update URL with current currency selections
+  const syncURL = useCallback(
+    (inputId: string | undefined, outputId: string | undefined) => {
+      const params = new URLSearchParams()
+      if (inputId) params.set('inputCurrency', inputId)
+      if (outputId) params.set('outputCurrency', outputId)
+      const search = params.toString()
+      history.replace({ pathname: '/swap', search: search ? `?${search}` : '' })
+    },
+    [history]
+  )
   const isValid = !swapInputError
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
 
@@ -215,25 +244,30 @@ export default function Swap() {
   }, [attemptingTxn, showConfirm, swapErrorMessage, trade, txHash])
 
   const handleInputSelect = useCallback(
-    inputCurrency => {
+    (inputCurrency: Currency) => {
       setApprovalSubmitted(false) // reset 2 step UI for approvals
       onCurrencySelection(Field.INPUT, inputCurrency)
+      syncURL(currencyToId(inputCurrency), currencyToId(currencies[Field.OUTPUT]!))
     },
-    [onCurrencySelection]
+    [onCurrencySelection, syncURL, currencyToId, currencies]
   )
 
   const handleMaxInput = useCallback(() => {
     maxAmountInput && onUserInput(Field.INPUT, maxAmountInput.toExact())
   }, [maxAmountInput, onUserInput])
 
-  const handleOutputSelect = useCallback(outputCurrency => onCurrencySelection(Field.OUTPUT, outputCurrency), [
-    onCurrencySelection
-  ])
+  const handleOutputSelect = useCallback(
+    (outputCurrency: Currency) => {
+      onCurrencySelection(Field.OUTPUT, outputCurrency)
+      syncURL(currencyToId(currencies[Field.INPUT]!), currencyToId(outputCurrency))
+    },
+    [onCurrencySelection, syncURL, currencyToId, currencies]
+  )
 
   return (
     <>
       <TokenWarningModal
-        isOpen={urlLoadedTokens.length > 0 && !dismissTokenWarning}
+        isOpen={urlLoadedTokens.length > 0}
         tokens={urlLoadedTokens}
         onConfirm={handleConfirmTokenWarning}
       />
@@ -275,6 +309,7 @@ export default function Swap() {
                     onClick={() => {
                       setApprovalSubmitted(false) // reset 2 step UI for approvals
                       onSwitchTokens()
+                      syncURL(currencyToId(currencies[Field.OUTPUT]!), currencyToId(currencies[Field.INPUT]!))
                     }}
                     color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.primary1 : theme.text2}
                   />

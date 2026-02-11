@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { isMobile } from 'react-device-detect'
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
+import { useAccount, useConnect } from 'wagmi'
 import usePrevious from '../../hooks/usePrevious'
 import { useWalletModalOpen, useWalletModalToggle } from '../../state/application/hooks'
 
 import Modal from '../Modal'
 import AccountDetails from '../AccountDetails'
-import PendingView from './PendingView'
-import Option from './Option'
-import { SUPPORTED_WALLETS } from '../../constants'
 import MetamaskIcon from '../../assets/images/metamask.png'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
-import { injected } from '../../connectors'
-import { AbstractConnector } from '@web3-react/abstract-connector'
+import Loader from '../Loader'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -42,7 +37,7 @@ const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   padding: 1rem 1rem;
   font-weight: 500;
-  color: ${props => (props.color === 'blue' ? ({ theme }) => theme.primary1 : 'inherit')};
+  color: ${(props: any) => (props.color === 'blue' ? ({ theme }: any) => theme.primary1 : 'inherit')};
   ${({ theme }) => theme.mediaWidth.upToMedium`
     padding: 1rem;
   `};
@@ -92,28 +87,52 @@ const HoverText = styled.div`
   }
 `
 
+const OptionButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.bg3};
+  background-color: ${({ theme }) => theme.bg1};
+  color: ${({ theme }) => theme.text1};
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.primary1};
+    background-color: ${({ theme }) => theme.bg2};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  img {
+    width: 28px;
+    height: 28px;
+  }
+`
+
 const WALLET_VIEWS = {
   OPTIONS: 'options',
-  OPTIONS_SECONDARY: 'options_secondary',
-  ACCOUNT: 'account',
-  PENDING: 'pending'
+  ACCOUNT: 'account'
 }
 
 export default function WalletModal({
   pendingTransactions,
   confirmedTransactions
 }: {
-  pendingTransactions: string[] // hashes of pending
-  confirmedTransactions: string[] // hashes of confirmed
+  pendingTransactions: string[]
+  confirmedTransactions: string[]
 }) {
-  // important that these are destructed from the account-specific web3-react context
-  const { active, account, connector, activate, error } = useWeb3React()
+  const { address: account, isConnected } = useAccount()
+  const { connect, connectors, isPending, error } = useConnect()
 
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT)
-
-  const [pendingWallet, setPendingWallet] = useState<AbstractConnector | undefined>()
-
-  const [pendingError, setPendingError] = useState<boolean>()
 
   const walletModalOpen = useWalletModalOpen()
   const toggleWalletModal = useWalletModalToggle()
@@ -130,113 +149,21 @@ export default function WalletModal({
   // always reset to account view
   useEffect(() => {
     if (walletModalOpen) {
-      setPendingError(false)
       setWalletView(WALLET_VIEWS.ACCOUNT)
     }
   }, [walletModalOpen])
 
-  // close modal when a connection is successful
-  const activePrevious = usePrevious(active)
-  const connectorPrevious = usePrevious(connector)
-  useEffect(() => {
-    if (walletModalOpen && ((active && !activePrevious) || (connector && connector !== connectorPrevious && !error))) {
-      setWalletView(WALLET_VIEWS.ACCOUNT)
-    }
-  }, [setWalletView, active, error, connector, walletModalOpen, activePrevious, connectorPrevious])
+  // De-duplicate connectors by name
+  const uniqueConnectors = connectors.filter((c, i, self) => i === self.findIndex(x => x.name === c.name))
 
-  const tryActivation = async (connector: AbstractConnector | undefined) => {
-    setPendingWallet(connector) // set wallet for pending view
-    setWalletView(WALLET_VIEWS.PENDING)
-
-    connector &&
-      activate(connector, undefined, true).catch(error => {
-        if (error instanceof UnsupportedChainIdError) {
-          activate(connector) // a little janky...can't use setError because the connector isn't set
-        } else {
-          setPendingError(true)
-        }
-      })
-  }
-
-  // get wallets user can switch too, depending on device/browser
   function getOptions() {
-    const isMetamask = window.ethereum && window.ethereum.isMetaMask
-    return Object.keys(SUPPORTED_WALLETS).map(key => {
-      const option = SUPPORTED_WALLETS[key]
-      // check for mobile options
-      if (isMobile) {
-        if (!window.web3 && !window.ethereum && option.mobile) {
-          return (
-            <Option
-              onClick={() => {
-                option.connector !== connector && !option.href && tryActivation(option.connector)
-              }}
-              id={`connect-${key}`}
-              key={key}
-              active={option.connector && option.connector === connector}
-              color={option.color}
-              link={option.href}
-              header={option.name}
-              subheader={null}
-              icon={require('../../assets/images/' + option.iconName)}
-            />
-          )
-        }
-        return null
-      }
-
-      // overwrite injected when needed
-      if (option.connector === injected) {
-        // don't show injected if there's no injected provider
-        if (!(window.web3 || window.ethereum)) {
-          if (option.name === 'MetaMask') {
-            return (
-              <Option
-                id={`connect-${key}`}
-                key={key}
-                color={'blue'}
-                header={'Install Metamask'}
-                subheader={null}
-                link={'https://metamask.io/'}
-                icon={MetamaskIcon}
-              />
-            )
-          } else {
-            return null //dont want to return install twice
-          }
-        }
-        // don't return metamask if injected provider isn't metamask
-        else if (option.name === 'MetaMask' && !isMetamask) {
-          return null
-        }
-        // likewise for generic
-        else if (option.name === 'Injected' && isMetamask) {
-          return null
-        }
-      }
-
-      // return rest of options
-      return (
-        !isMobile &&
-        !option.mobileOnly && (
-          <Option
-            id={`connect-${key}`}
-            onClick={() => {
-              option.connector === connector
-                ? setWalletView(WALLET_VIEWS.ACCOUNT)
-                : !option.href && tryActivation(option.connector)
-            }}
-            key={key}
-            active={option.connector === connector}
-            color={option.color}
-            link={option.href}
-            header={option.name}
-            subheader={null} //use option.descriptio to bring back multi-line
-            icon={require('../../assets/images/' + option.iconName)}
-          />
-        )
-      )
-    })
+    return uniqueConnectors.map(connector => (
+      <OptionButton key={connector.uid} onClick={() => connect({ connector })} disabled={isPending}>
+        <img src={MetamaskIcon} alt={connector.name} />
+        <span>{connector.name === 'Injected' ? 'Browser Wallet' : connector.name}</span>
+        {isPending && <Loader />}
+      </OptionButton>
+    ))
   }
 
   function getModalContent() {
@@ -246,23 +173,23 @@ export default function WalletModal({
           <CloseIcon onClick={toggleWalletModal}>
             <CloseColor />
           </CloseIcon>
-          <HeaderRow>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error connecting'}</HeaderRow>
+          <HeaderRow>Error connecting</HeaderRow>
           <ContentWrapper>
-            {error instanceof UnsupportedChainIdError ? (
-              <h5>Please connect to the appropriate Cardona zkEVM network.</h5>
-            ) : (
-              'Error connecting. Try refreshing the page.'
-            )}
+            <h5>Error connecting. Try refreshing the page.</h5>
+            <h5 style={{ marginTop: '8px' }}>
+              Please make sure you are connected to the TEN network via the TEN Gateway.
+            </h5>
           </ContentWrapper>
         </UpperSection>
       )
     }
-    if (account && walletView === WALLET_VIEWS.ACCOUNT) {
+    if (isConnected && account && walletView === WALLET_VIEWS.ACCOUNT) {
       return (
         <AccountDetails
           toggleWalletModal={toggleWalletModal}
           pendingTransactions={pendingTransactions}
           confirmedTransactions={confirmedTransactions}
+          openOptions={() => setWalletView(WALLET_VIEWS.OPTIONS)}
         />
       )
     }
@@ -273,14 +200,7 @@ export default function WalletModal({
         </CloseIcon>
         {walletView !== WALLET_VIEWS.ACCOUNT ? (
           <HeaderRow color="blue">
-            <HoverText
-              onClick={() => {
-                setPendingError(false)
-                setWalletView(WALLET_VIEWS.ACCOUNT)
-              }}
-            >
-              Back
-            </HoverText>
+            <HoverText onClick={() => setWalletView(WALLET_VIEWS.ACCOUNT)}>Back</HoverText>
           </HeaderRow>
         ) : (
           <HeaderRow>
@@ -288,16 +208,7 @@ export default function WalletModal({
           </HeaderRow>
         )}
         <ContentWrapper>
-          {walletView === WALLET_VIEWS.PENDING ? (
-            <PendingView
-              connector={pendingWallet}
-              error={pendingError}
-              setPendingError={setPendingError}
-              tryActivation={tryActivation}
-            />
-          ) : (
-            <OptionGrid>{getOptions()}</OptionGrid>
-          )}
+          <OptionGrid>{getOptions()}</OptionGrid>
         </ContentWrapper>
       </UpperSection>
     )

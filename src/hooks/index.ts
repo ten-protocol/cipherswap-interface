@@ -1,91 +1,48 @@
 import { Web3Provider } from '@ethersproject/providers'
-import { useWeb3React as useWeb3ReactCore } from '@web3-react/core'
-import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
-import { useEffect, useState } from 'react'
-import { isMobile } from 'react-device-detect'
+import { useAccount, useWalletClient } from 'wagmi'
+import { useMemo } from 'react'
 
 import { ChainId } from '../sdk'
-import { injected, addTenTestnetToMetaMask } from '../connectors'
-
-export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
-  const context = useWeb3ReactCore<Web3Provider>()
-  return context
-}
-
-export function useEagerConnect() {
-  const { activate, active } = useWeb3ReactCore() // specifically using useWeb3ReactCore because of what this hook does
-  const [tried, setTried] = useState(false)
-
-  useEffect(() => {
-    injected.isAuthorized().then(isAuthorized => {
-      if (isAuthorized) {
-        activate(injected, undefined, true).catch(() => {
-          // If activation fails, prompt to add TEN Testnet network
-          addTenTestnetToMetaMask().finally(() => {
-            setTried(true)
-          })
-        })
-      } else {
-        if (isMobile && window.ethereum) {
-          activate(injected, undefined, true).catch(() => {
-            addTenTestnetToMetaMask().finally(() => {
-              setTried(true)
-            })
-          })
-        } else {
-          setTried(true)
-        }
-      }
-    })
-  }, [activate]) // intentionally only running on mount (make sure it's only mounted once :))
-
-  // if the connection worked, wait until we get confirmation of that to flip the flag
-  useEffect(() => {
-    if (active) {
-      setTried(true)
-    }
-  }, [active])
-
-  return tried
-}
 
 /**
- * Use for network and injected - logs user in
- * and out after checking what network theyre on
+ * Bridge hook: returns the same interface as the old web3-react useActiveWeb3React,
+ * but backed by wagmi v2.
  */
-export function useInactiveListener(suppress = false) {
-  const { active, error, activate } = useWeb3ReactCore() // specifically using useWeb3React because of what this hook does
+export function useActiveWeb3React(): {
+  library: Web3Provider | undefined
+  chainId: ChainId | undefined
+  account: string | undefined
+  active: boolean
+} {
+  const { address, chainId, isConnected } = useAccount()
+  const { data: walletClient } = useWalletClient()
 
-  useEffect(() => {
-    const { ethereum } = window
-
-    if (ethereum && ethereum.on && !active && !error && !suppress) {
-      const handleChainChanged = () => {
-        // eat errors
-        activate(injected, undefined, true).catch(error => {
-          console.error('Failed to activate after chain changed', error)
-        })
-      }
-
-      const handleAccountsChanged = (accounts: string[]) => {
-        if (accounts.length > 0) {
-          // eat errors
-          activate(injected, undefined, true).catch(error => {
-            console.error('Failed to activate after accounts changed', error)
-          })
-        }
-      }
-
-      ethereum.on('chainChanged', handleChainChanged)
-      ethereum.on('accountsChanged', handleAccountsChanged)
-
-      return () => {
-        if (ethereum.removeListener) {
-          ethereum.removeListener('chainChanged', handleChainChanged)
-          ethereum.removeListener('accountsChanged', handleAccountsChanged)
-        }
-      }
+  const library = useMemo(() => {
+    if (!walletClient || !isConnected) return undefined
+    try {
+      const { chain, transport } = walletClient
+      const network = { chainId: chain.id, name: chain.name }
+      const provider = new Web3Provider(transport as any, network)
+      provider.pollingInterval = 15000
+      return provider
+    } catch (e) {
+      console.error('[useActiveWeb3React] Failed to create provider:', e)
     }
     return undefined
-  }, [active, error, suppress, activate])
+  }, [walletClient, isConnected])
+
+  return {
+    library,
+    chainId: chainId as ChainId | undefined,
+    account: address,
+    active: isConnected
+  }
+}
+
+export function useEagerConnect(): boolean {
+  return true
+}
+
+export function useInactiveListener(_suppress?: boolean): void {
+  // no-op
 }

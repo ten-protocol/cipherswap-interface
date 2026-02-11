@@ -1,0 +1,165 @@
+name: Deploy Contracts to TEN Testnet
+
+on:
+  workflow_dispatch:
+    inputs:
+      weth_address:
+        description: 'WETH contract address'
+        required: false
+        default: '0x1000000000000000000000000000000000000042'
+      eth_per_pool:
+        description: 'ETH per liquidity pool (e.g. 0.5)'
+        required: false
+        default: '0.5'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Deploy contracts
+        id: deploy
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          TEN_TESTNET_RPC: ${{ secrets.TEN_TESTNET_RPC }}
+          WETH_ADDRESS: ${{ inputs.weth_address }}
+          ETH_PER_POOL: ${{ inputs.eth_per_pool }}
+        run: |
+          npx hardhat run scripts/deploy.ts --network ten_testnet 2>&1 | tee deploy_output.txt
+
+          # Parse deployed addresses from deployment JSON
+          DEPLOY_JSON=$(ls -t deployments/deployment-*.json 2>/dev/null | head -1)
+          if [ -z "$DEPLOY_JSON" ]; then
+            echo "::error::No deployment JSON found"
+            exit 1
+          fi
+
+          echo "deployment_file=$DEPLOY_JSON" >> "$GITHUB_OUTPUT"
+
+          # Extract addresses for the summary
+          echo "factory=$(jq -r '.contracts.factory' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "router=$(jq -r '.contracts.router' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "alpha=$(jq -r '.contracts.alphaToken' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "beta=$(jq -r '.contracts.betaToken' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "weth=$(jq -r '.contracts.weth' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "init_hash=$(jq -r '.initCodeHash' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "pool_alpha_weth=$(jq -r '.pools.alphaWeth' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "pool_beta_weth=$(jq -r '.pools.betaWeth' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+          echo "pool_alpha_beta=$(jq -r '.pools.alphaBeta' "$DEPLOY_JSON")" >> "$GITHUB_OUTPUT"
+
+      - name: Print Vercel environment variables
+        env:
+          FACTORY: ${{ steps.deploy.outputs.factory }}
+          ROUTER: ${{ steps.deploy.outputs.router }}
+          ALPHA: ${{ steps.deploy.outputs.alpha }}
+          BETA: ${{ steps.deploy.outputs.beta }}
+          WETH: ${{ steps.deploy.outputs.weth }}
+          INIT_HASH: ${{ steps.deploy.outputs.init_hash }}
+          POOL_AW: ${{ steps.deploy.outputs.pool_alpha_weth }}
+          POOL_BW: ${{ steps.deploy.outputs.pool_beta_weth }}
+          POOL_AB: ${{ steps.deploy.outputs.pool_alpha_beta }}
+        run: |
+          echo ""
+          echo "============================================"
+          echo "  UPDATE THESE IN VERCEL ENV VARIABLES"
+          echo "============================================"
+          echo ""
+          cat <<EOF
+          {
+            "REACT_APP_FACTORY_ADDRESS": "$FACTORY",
+            "REACT_APP_ROUTER_ADDRESS": "$ROUTER",
+            "REACT_APP_ALPHA_TOKEN_ADDRESS": "$ALPHA",
+            "REACT_APP_BETA_TOKEN_ADDRESS": "$BETA",
+            "REACT_APP_WETH_ADDRESS": "$WETH",
+            "REACT_APP_INIT_CODE_HASH": "$INIT_HASH"
+          }
+          EOF
+          echo ""
+          echo "Liquidity Pools:"
+          echo "  ALPHA/WETH: $POOL_AW"
+          echo "  BETA/WETH:  $POOL_BW"
+          echo "  ALPHA/BETA: $POOL_AB"
+          echo ""
+          echo "============================================"
+          echo "  Copy the JSON above into Vercel:"
+          echo "  Project Settings > Environment Variables"
+          echo "============================================"
+
+      - name: Job summary
+        env:
+          FACTORY: ${{ steps.deploy.outputs.factory }}
+          ROUTER: ${{ steps.deploy.outputs.router }}
+          ALPHA: ${{ steps.deploy.outputs.alpha }}
+          BETA: ${{ steps.deploy.outputs.beta }}
+          WETH: ${{ steps.deploy.outputs.weth }}
+          INIT_HASH: ${{ steps.deploy.outputs.init_hash }}
+          POOL_AW: ${{ steps.deploy.outputs.pool_alpha_weth }}
+          POOL_BW: ${{ steps.deploy.outputs.pool_beta_weth }}
+          POOL_AB: ${{ steps.deploy.outputs.pool_alpha_beta }}
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Contract Deployment Results
+
+          ### Vercel Environment Variables
+
+          Copy this JSON into **Vercel > Project Settings > Environment Variables**:
+
+          \`\`\`json
+          {
+            "REACT_APP_FACTORY_ADDRESS": "$FACTORY",
+            "REACT_APP_ROUTER_ADDRESS": "$ROUTER",
+            "REACT_APP_ALPHA_TOKEN_ADDRESS": "$ALPHA",
+            "REACT_APP_BETA_TOKEN_ADDRESS": "$BETA",
+            "REACT_APP_WETH_ADDRESS": "$WETH",
+            "REACT_APP_INIT_CODE_HASH": "$INIT_HASH"
+          }
+          \`\`\`
+
+          ### Deployed Contracts
+
+          | Contract | Address |
+          |----------|---------|
+          | Factory  | \`$FACTORY\` |
+          | Router   | \`$ROUTER\` |
+          | ALPHA    | \`$ALPHA\` |
+          | BETA     | \`$BETA\` |
+          | WETH     | \`$WETH\` |
+
+          ### Liquidity Pools
+
+          | Pair | Address |
+          |------|---------|
+          | ALPHA/WETH | \`$POOL_AW\` |
+          | BETA/WETH  | \`$POOL_BW\` |
+          | ALPHA/BETA | \`$POOL_AB\` |
+
+          ### Configuration
+
+          - **Init Code Hash**: \`$INIT_HASH\`
+          - **ETH per pool**: ${{ inputs.eth_per_pool }}
+          - **WETH address**: ${{ inputs.weth_address }}
+          EOF
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-result
+          path: contracts/deployments/
+          retention-days: 90

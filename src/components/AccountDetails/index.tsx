@@ -1,27 +1,26 @@
 import React, { useCallback, useContext } from 'react'
 import { useDispatch } from 'react-redux'
 import styled, { ThemeContext } from 'styled-components'
-import { useActiveWeb3React } from '../../hooks'
+import { useAccount, useDisconnect } from 'wagmi'
 import { AppDispatch } from '../../state'
 import { clearAllTransactions } from '../../state/transactions/actions'
-import { shortenAddress } from '../../utils'
+import { shortenAddress, getScanLink } from '../../utils'
 import { AutoRow } from '../Row'
 import Copy from './Copy'
 import Transaction from './Transaction'
 
-import { SUPPORTED_WALLETS } from '../../constants'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
-import { getScanLink } from '../../utils'
-import { injected } from '../../connectors'
+import { ChainId } from '../../sdk'
 import Identicon from '../Identicon'
 import { ExternalLink as LinkIcon } from 'react-feather'
 import { ExternalLink, LinkStyledButton, TYPE } from '../../theme'
+import { ButtonSecondary } from '../Button'
 
 const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   padding: 1rem 1rem;
   font-weight: 500;
-  color: ${props => (props.color === 'blue' ? ({ theme }) => theme.primary1 : 'inherit')};
+  color: ${(props: any) => (props.color === 'blue' ? ({ theme }: any) => theme.primary1 : 'inherit')};
   ${({ theme }) => theme.mediaWidth.upToMedium`
     padding: 1rem;
   `};
@@ -179,6 +178,18 @@ const TransactionListWrapper = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap};
 `
 
+const WalletAction = styled(ButtonSecondary)`
+  width: fit-content;
+  font-weight: 400;
+  margin-left: 8px;
+  font-size: 0.825rem;
+  padding: 4px 6px;
+  :hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+`
+
 function renderTransactions(transactions: string[]) {
   return (
     <TransactionListWrapper>
@@ -193,38 +204,28 @@ interface AccountDetailsProps {
   toggleWalletModal: () => void
   pendingTransactions: string[]
   confirmedTransactions: string[]
+  openOptions: () => void
 }
 
 export default function AccountDetails({
   toggleWalletModal,
   pendingTransactions,
-  confirmedTransactions
+  confirmedTransactions,
+  openOptions
 }: AccountDetailsProps) {
-  const { chainId, account, connector } = useActiveWeb3React()
+  const { address: account, chainId, connector } = useAccount()
+  const { disconnect } = useDisconnect()
   const theme = useContext(ThemeContext)
   const dispatch = useDispatch<AppDispatch>()
 
-  function formatConnectorName() {
-    const { ethereum } = window
-    const isMetaMask = !!(ethereum && ethereum.isMetaMask)
-    const name = Object.keys(SUPPORTED_WALLETS)
-      .filter(
-        k =>
-          SUPPORTED_WALLETS[k].connector === connector && (connector !== injected || isMetaMask === (k === 'METAMASK'))
-      )
-      .map(k => SUPPORTED_WALLETS[k].name)[0]
-    return <WalletName>Connected with {name}</WalletName>
-  }
+  const connectorName = connector?.name || 'Wallet'
 
   function getStatusIcon() {
-    if (connector === injected) {
-      return (
-        <IconWrapper size={16}>
-          <Identicon />
-        </IconWrapper>
-      )
-    }
-    return null
+    return (
+      <IconWrapper size={16}>
+        <Identicon />
+      </IconWrapper>
+    )
   }
 
   const clearAllTransactionsCallback = useCallback(() => {
@@ -241,7 +242,23 @@ export default function AccountDetails({
         <AccountSection>
           <YourAccount>
             <InfoCard>
-              <AccountGroupingRow>{formatConnectorName()}</AccountGroupingRow>
+              <AccountGroupingRow>
+                <WalletName>Connected with {connectorName}</WalletName>
+                <div>
+                  <WalletAction
+                    style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
+                    onClick={() => {
+                      disconnect()
+                      toggleWalletModal()
+                    }}
+                  >
+                    Disconnect
+                  </WalletAction>
+                  <WalletAction style={{ fontSize: '.825rem', fontWeight: 400 }} onClick={openOptions}>
+                    Change
+                  </WalletAction>
+                </div>
+              </AccountGroupingRow>
               <AccountGroupingRow id="web3-account-identifier-row">
                 <AccountControl>
                   <div>
@@ -259,7 +276,7 @@ export default function AccountDetails({
                       </Copy>
                     )}
                     {chainId && account && (
-                      <AddressLink href={getScanLink(chainId, account, 'address')}>
+                      <AddressLink href={getScanLink(chainId as ChainId, account, 'address')}>
                         <LinkIcon size={16} />
                         <span style={{ marginLeft: '4px' }}>View on TenScan</span>
                       </AddressLink>

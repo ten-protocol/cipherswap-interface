@@ -1,4 +1,5 @@
 import { Contract } from '@ethersproject/contracts'
+import { Web3Provider } from '@ethersproject/providers'
 import { useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useActiveWeb3React } from '../../hooks'
@@ -20,22 +21,49 @@ import {
 const CALL_CHUNK_SIZE = 500
 
 /**
- * Fetches a chunk of calls, enforcing a minimum block number constraint
- * @param multicallContract multicall contract to fetch against
- * @param chunk chunk of calls to make
- * @param minBlockNumber minimum block number of the result set
+ * Fallback: execute each call individually via eth_call when multicall aggregate fails.
+ * Needed for TEN testnet where the multicall contract can't access private data.
+ * Uses 'latest' block tag since TEN may not support historical block queries.
+ */
+async function fetchChunkDirect(
+  provider: Web3Provider,
+  chunk: Call[],
+  blockNumber: number,
+  account?: string
+): Promise<{ results: string[]; blockNumber: number }> {
+  const results = await Promise.all(
+    chunk.map(async call => {
+      try {
+        // TEN requires 'from' on eth_call for privacy - include account if available
+        return await provider.call({ to: call.address, data: call.callData, ...(account ? { from: account } : {}) })
+      } catch {
+        return '0x'
+      }
+    })
+  )
+  return { results, blockNumber }
+}
+
+/**
+ * Fetches a chunk of calls, enforcing a minimum block number constraint.
+ * Falls back to direct per-call eth_call if multicall aggregate fails.
  */
 async function fetchChunk(
   multicallContract: Contract,
   chunk: Call[],
-  minBlockNumber: number
+  minBlockNumber: number,
+  provider?: Web3Provider,
+  account?: string
 ): Promise<{ results: string[]; blockNumber: number }> {
   console.debug('Fetching chunk', multicallContract, chunk, minBlockNumber)
   let resultsBlockNumber, returnData
   try {
     ;[resultsBlockNumber, returnData] = await multicallContract.aggregate(chunk.map(obj => [obj.address, obj.callData]))
   } catch (error) {
-    console.debug('Failed to fetch chunk inside retry', error)
+    console.debug('Multicall aggregate failed, falling back to direct calls', error)
+    if (provider) {
+      return fetchChunkDirect(provider, chunk, minBlockNumber, account)
+    }
     throw error
   }
   if (resultsBlockNumber.toNumber() < minBlockNumber) {
@@ -116,7 +144,7 @@ export default function Updater(): null {
   // wait for listeners to settle before triggering updates
   const debouncedListeners = useDebounce(state.callListeners, 100)
   const latestBlockNumber = useBlockNumber()
-  const { chainId } = useActiveWeb3React()
+  const { chainId, library, account } = useActiveWeb3React()
   const multicallContract = useMulticallContract()
   const cancellations = useRef<{ blockNumber: number; cancellations: (() => void)[] }>()
 
@@ -156,11 +184,14 @@ export default function Updater(): null {
     cancellations.current = {
       blockNumber: latestBlockNumber,
       cancellations: chunkedCalls.map((chunk, index) => {
-        const { cancel, promise } = retry(() => fetchChunk(multicallContract, chunk, latestBlockNumber), {
-          n: Infinity,
-          minWait: 2500,
-          maxWait: 3500
-        })
+        const { cancel, promise } = retry(
+          () => fetchChunk(multicallContract, chunk, latestBlockNumber, library, account),
+          {
+            n: Infinity,
+            minWait: 2500,
+            maxWait: 3500
+          }
+        )
         promise
           .then(({ results: returnData, blockNumber: fetchBlockNumber }) => {
             cancellations.current = { cancellations: [], blockNumber: latestBlockNumber }
@@ -199,7 +230,7 @@ export default function Updater(): null {
         return cancel
       })
     }
-  }, [chainId, multicallContract, dispatch, serializedOutdatedCallKeys, latestBlockNumber])
+  }, [chainId, multicallContract, dispatch, serializedOutdatedCallKeys, latestBlockNumber, library, account])
 
   return null
 }

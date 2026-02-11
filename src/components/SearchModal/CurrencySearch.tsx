@@ -46,8 +46,11 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
 
-  // ETH/native currency disabled -- TEN testnet uses token-to-token swaps only
-  const showETH: boolean = false
+  const showETH: boolean = useMemo(() => {
+    const s = searchQuery.toLowerCase().trim()
+    if (s === '' || s === 'e' || s === 'et' || s === 'eth' || s === 'ether') return true
+    return false
+  }, [searchQuery])
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
@@ -88,7 +91,7 @@ export function CurrencySearch({
 
   // manage focus on modal show
   const inputRef = useRef<HTMLInputElement>()
-  const handleInput = useCallback(event => {
+  const handleInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value
     const checksummedInput = isAddress(input)
     setSearchQuery(checksummedInput || input)
@@ -127,7 +130,7 @@ export function CurrencySearch({
         <SearchInput
           type="text"
           id="token-search-input"
-          placeholder="Paste address"
+          placeholder="Search name or paste address"
           value={searchQuery}
           ref={inputRef as RefObject<HTMLInputElement>}
           onChange={handleInput}
@@ -148,7 +151,7 @@ export function CurrencySearch({
 
       <div style={{ flex: '1' }}>
         <AutoSizer disableWidth>
-          {({ height }) => (
+          {({ height }: { height: number }) => (
             <CurrencyList
               height={height}
               showETH={showETH}
