@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useBalance, useReadContracts } from 'wagmi'
-import { erc20Abi } from 'viem'
+import { Address, erc20Abi } from 'viem'
 
 import { Currency, CurrencyAmount, ETHER, JSBI, Token, TokenAmount } from '../../sdk'
 import { useAllTokens } from '../../hooks/Tokens'
@@ -27,8 +27,8 @@ export function useETHBalances(
 
   const primaryAddress = addresses.length > 0 ? addresses[0] : undefined
 
-  const { data: balanceData, error: ethError, status: ethStatus } = useBalance({
-    address: primaryAddress as `0x${string}` | undefined,
+  const { data: balanceData } = useBalance({
+    address: primaryAddress as Address | undefined,
     chainId: TEN_CHAIN_ID,
     query: {
       enabled: !!primaryAddress,
@@ -60,10 +60,10 @@ export function useTokenBalancesWithLoadingIndicator(
   const contracts = useMemo(
     () =>
       validatedTokens.map(token => ({
-        address: token.address as `0x${string}`,
+        address: token.address as Address,
         abi: erc20Abi,
         functionName: 'balanceOf' as const,
-        args: [address as `0x${string}`],
+        args: [address as Address],
         chainId: TEN_CHAIN_ID
       })),
     [validatedTokens, address]
@@ -71,7 +71,7 @@ export function useTokenBalancesWithLoadingIndicator(
 
   const enabled = !!address && validatedTokens.length > 0
 
-  const { data, isLoading, error: readError, status: readStatus } = useReadContracts({
+  const { data, isLoading } = useReadContracts({
     contracts: address ? contracts : [],
     query: {
       enabled,

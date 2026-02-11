@@ -15,7 +15,7 @@ import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
 const queryClient = new QueryClient()
 
 if ('ethereum' in window) {
-  ; (window.ethereum as any).autoRefreshOnNetworkChange = false
+  ;(window.ethereum as any).autoRefreshOnNetworkChange = false
 }
 
 function Updaters() {

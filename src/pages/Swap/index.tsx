@@ -244,7 +244,7 @@ export default function Swap() {
   }, [attemptingTxn, showConfirm, swapErrorMessage, trade, txHash])
 
   const handleInputSelect = useCallback(
-    inputCurrency => {
+    (inputCurrency: Currency) => {
       setApprovalSubmitted(false) // reset 2 step UI for approvals
       onCurrencySelection(Field.INPUT, inputCurrency)
       syncURL(currencyToId(inputCurrency), currencyToId(currencies[Field.OUTPUT]!))
@@ -257,7 +257,7 @@ export default function Swap() {
   }, [maxAmountInput, onUserInput])
 
   const handleOutputSelect = useCallback(
-    outputCurrency => {
+    (outputCurrency: Currency) => {
       onCurrencySelection(Field.OUTPUT, outputCurrency)
       syncURL(currencyToId(currencies[Field.INPUT]!), currencyToId(outputCurrency))
     },
