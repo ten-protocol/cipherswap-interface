@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { Currency, currencyEquals, ETHER, WETH } from '../sdk'
+import { Currency, currencyEquals, ETHER, Token, WETH } from '../sdk'
 import { tryParseAmount } from '../state/swap/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { useCurrencyBalance } from '../state/wallet/hooks'
@@ -33,15 +33,44 @@ export default function useWrapCallback(
   const addTransaction = useTransactionAdder()
 
   return useMemo(() => {
-    if (!wethContract || !chainId || !inputCurrency || !outputCurrency) return NOT_APPLICABLE
+    // Detect wrap/unwrap based on currencies alone — don't require wethContract for detection
+    if (!chainId || !inputCurrency || !outputCurrency) {
+      console.log('[Wrap] NOT_APPLICABLE: missing', { chainId, inputCurrency: inputCurrency?.symbol, outputCurrency: outputCurrency?.symbol })
+      return NOT_APPLICABLE
+    }
+
+    const weth = WETH[chainId]
+    if (!weth) {
+      console.log('[Wrap] NOT_APPLICABLE: no WETH for chainId', chainId, 'WETH keys:', Object.keys(WETH))
+      return NOT_APPLICABLE
+    }
+
+    const isInputETH = inputCurrency === ETHER
+    const isOutputETH = outputCurrency === ETHER
+    const isOutputWETH = outputCurrency instanceof Token && currencyEquals(weth, outputCurrency)
+    const isInputWETH = inputCurrency instanceof Token && currencyEquals(weth, inputCurrency)
+
+    console.log('[Wrap] check:', {
+      chainId,
+      wethAddr: weth.address,
+      inputSymbol: inputCurrency.symbol,
+      outputSymbol: outputCurrency.symbol,
+      isInputETH,
+      isOutputETH,
+      isOutputWETH,
+      isInputWETH,
+      inputAddr: inputCurrency instanceof Token ? inputCurrency.address : 'ETHER',
+      outputAddr: outputCurrency instanceof Token ? outputCurrency.address : 'ETHER',
+      wethContract: !!wethContract
+    })
 
     const sufficientBalance = inputAmount && balance && !balance.lessThan(inputAmount)
 
-    if (inputCurrency === ETHER && currencyEquals(WETH[chainId], outputCurrency)) {
+    if (isInputETH && isOutputWETH) {
       return {
         wrapType: WrapType.WRAP,
         execute:
-          sufficientBalance && inputAmount
+          sufficientBalance && inputAmount && wethContract
             ? async () => {
                 try {
                   const txReceipt = await wethContract.deposit({ value: `0x${inputAmount.raw.toString(16)}` })
@@ -53,11 +82,11 @@ export default function useWrapCallback(
             : undefined,
         inputError: sufficientBalance ? undefined : 'Insufficient ETH balance'
       }
-    } else if (currencyEquals(WETH[chainId], inputCurrency) && outputCurrency === ETHER) {
+    } else if (isInputWETH && isOutputETH) {
       return {
         wrapType: WrapType.UNWRAP,
         execute:
-          sufficientBalance && inputAmount
+          sufficientBalance && inputAmount && wethContract
             ? async () => {
                 try {
                   const txReceipt = await wethContract.withdraw(`0x${inputAmount.raw.toString(16)}`)

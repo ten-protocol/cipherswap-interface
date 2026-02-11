@@ -309,11 +309,7 @@ export default function Swap() {
                     onClick={() => {
                       setApprovalSubmitted(false) // reset 2 step UI for approvals
                       onSwitchTokens()
-                      // swap URL params (input becomes output, output becomes input)
-                      syncURL(
-                        currencyToId(currencies[Field.OUTPUT]!),
-                        currencyToId(currencies[Field.INPUT]!)
-                      )
+                      syncURL(currencyToId(currencies[Field.OUTPUT]!), currencyToId(currencies[Field.INPUT]!))
                     }}
                     color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.primary1 : theme.text2}
                   />

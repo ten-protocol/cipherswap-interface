@@ -2,7 +2,7 @@ import React, { useState, useContext, useCallback } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 import { darken } from 'polished'
 
-import { Currency, Pair } from '../../sdk'
+import { Currency, Pair, Token } from '../../sdk'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
 import CurrencyLogo from '../CurrencyLogo'
@@ -150,6 +150,14 @@ export default function CurrencyInputPanel({
   const { account } = useActiveWeb3React()
   const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const theme = useContext(ThemeContext)
+
+  console.log(`[CurrencyInputPanel ${id}]`, {
+    account,
+    currency: currency?.symbol,
+    isToken: currency instanceof Token,
+    balance: selectedCurrencyBalance?.toExact(),
+    balanceRaw: selectedCurrencyBalance
+  })
 
   const handleDismissSearch = useCallback(() => {
     setModalOpen(false)

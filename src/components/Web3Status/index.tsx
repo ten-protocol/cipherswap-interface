@@ -1,12 +1,9 @@
-import { AbstractConnector } from '@web3-react/abstract-connector'
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
 import { darken, lighten } from 'polished'
 import React, { useMemo } from 'react'
 import { Activity } from 'react-feather'
 import styled, { css } from 'styled-components'
-import { injected } from '../../connectors'
-import { NetworkContextName } from '../../constants'
-import { useHasSocks } from '../../hooks/useSocksBalance'
+import { useAccount } from 'wagmi'
+import { TEN_CHAIN_ID } from '../../lib/wagmiConfig'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { isTransactionRecent, useAllTransactions } from '../../state/transactions/hooks'
 import { TransactionDetails } from '../../state/transactions/reducer'
@@ -107,22 +104,8 @@ function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
   return b.addedTime - a.addedTime
 }
 
-const SOCK = (
-  <span role="img" aria-label="has socks emoji" style={{ marginTop: -4, marginBottom: -4 }}>
-    🧦
-  </span>
-)
-
-// eslint-disable-next-line react/prop-types
-function StatusIcon({ connector }: { connector: AbstractConnector }) {
-  if (connector === injected) {
-    return <Identicon />
-  }
-  return null
-}
-
 function Web3StatusInner() {
-  const { account, connector, error } = useWeb3React()
+  const { address: account, isConnected, chain } = useAccount()
 
   const allTransactions = useAllTransactions()
 
@@ -134,10 +117,19 @@ function Web3StatusInner() {
   const pending = sortedRecentTransactions.filter(tx => !tx.receipt).map(tx => tx.hash)
 
   const hasPendingTransactions = !!pending.length
-  const hasSocks = useHasSocks()
   const toggleWalletModal = useWalletModalToggle()
 
-  if (account) {
+  const isWrongChain = isConnected && (!chain || chain.id !== TEN_CHAIN_ID)
+
+  if (isConnected && account) {
+    if (isWrongChain) {
+      return (
+        <Web3StatusError onClick={toggleWalletModal}>
+          <NetworkIcon />
+          <Text>Wrong Network</Text>
+        </Web3StatusError>
+      )
+    }
     return (
       <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
         {hasPendingTransactions ? (
@@ -145,34 +137,21 @@ function Web3StatusInner() {
             <Text>{pending?.length} Pending</Text> <Loader stroke="white" />
           </RowBetween>
         ) : (
-          <>
-            {hasSocks ? SOCK : null}
-            <Text>{shortenAddress(account)}</Text>
-          </>
+          <Text>{shortenAddress(account)}</Text>
         )}
-        {!hasPendingTransactions && connector && <StatusIcon connector={connector} />}
+        {!hasPendingTransactions && <Identicon />}
       </Web3StatusConnected>
     )
-  } else if (error) {
-    return (
-      <Web3StatusError onClick={toggleWalletModal}>
-        <NetworkIcon />
-        <Text>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error'}</Text>
-      </Web3StatusError>
-    )
-  } else {
-    return (
-      <Web3StatusConnect id="connect-wallet" onClick={toggleWalletModal} faded={!account}>
-        <Text>Connect to a wallet</Text>
-      </Web3StatusConnect>
-    )
   }
+
+  return (
+    <Web3StatusConnect id="connect-wallet" onClick={toggleWalletModal} faded={!account}>
+      <Text>Connect to a wallet</Text>
+    </Web3StatusConnect>
+  )
 }
 
 export default function Web3Status() {
-  const { active } = useWeb3React()
-  const contextNetwork = useWeb3React(NetworkContextName)
-
   const allTransactions = useAllTransactions()
 
   const sortedRecentTransactions = useMemo(() => {
@@ -182,10 +161,6 @@ export default function Web3Status() {
 
   const pending = sortedRecentTransactions.filter(tx => !tx.receipt).map(tx => tx.hash)
   const confirmed = sortedRecentTransactions.filter(tx => tx.receipt).map(tx => tx.hash)
-
-  if (!contextNetwork.active && !active) {
-    return null
-  }
 
   return (
     <>
