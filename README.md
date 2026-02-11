@@ -34,6 +34,67 @@ REACT_APP_WETH_ADDRESS=0x0000000000000000000000000000000000000001
 yarn start
 ```
 
+## Contract Deployment
+
+The `contracts/` directory contains a self-contained Hardhat project for deploying the full Uniswap V2 suite to TEN Testnet.
+
+### Setup
+
+```bash
+cd contracts
+npm install
+cp .env.example .env
+```
+
+Edit `contracts/.env` with your deployer private key and RPC URL:
+
+```bash
+DEPLOYER_PRIVATE_KEY=0xYOUR_PRIVATE_KEY_HERE
+TEN_TESTNET_RPC=https://testnet-rpc.ten.xyz/v1/?token=YOUR_TOKEN_HERE
+WETH_ADDRESS=0x1000000000000000000000000000000000000042
+ETH_PER_POOL=0.5
+```
+
+### Compile
+
+```bash
+npx hardhat compile
+```
+
+### Deploy
+
+```bash
+npx hardhat run scripts/deploy.ts --network ten_testnet
+```
+
+The deploy script will:
+
+1. Deploy UniswapV2Factory
+2. Compute and verify the init code hash
+3. Deploy UniswapV2Router02
+4. Deploy ALPHA token (100M supply)
+5. Deploy BETA token (100M supply)
+6. Create ALPHA/WETH pool (50M ALPHA + ETH)
+7. Create BETA/WETH pool (50M BETA + ETH)
+8. Create ALPHA/BETA pool (50M ALPHA + 50M BETA)
+9. Auto-update the root `.env` and `.env.production` with new addresses
+
+### Utility Scripts
+
+```bash
+# Compute init code hash from compiled UniswapV2Pair bytecode
+npx hardhat run scripts/compute-init-hash.ts
+```
+
+You can also run these from the project root:
+
+```bash
+yarn contracts:install
+yarn contracts:compile
+yarn contracts:deploy
+yarn contracts:compute-hash
+```
+
 ## Deployed Contracts (TEN Testnet)
 
 | Contract    | Address                                        |

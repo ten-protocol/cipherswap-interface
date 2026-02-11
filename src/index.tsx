@@ -7,6 +7,7 @@ import { wagmiConfig } from './lib/wagmiConfig'
 import App from './pages/App'
 import store from './state'
 import ApplicationUpdater from './state/application/updater'
+import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
 import UserUpdater from './state/user/updater'
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
@@ -22,6 +23,7 @@ function Updaters() {
     <>
       <UserUpdater />
       <ApplicationUpdater />
+      <MulticallUpdater />
       <TransactionUpdater />
     </>
   )

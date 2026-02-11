@@ -78,7 +78,11 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
-    "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix"
+    "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
+    "contracts:install": "cd contracts && npm install",
+    "contracts:compile": "cd contracts && npx hardhat compile",
+    "contracts:deploy": "cd contracts && npx hardhat run scripts/deploy.ts --network ten_testnet",
+    "contracts:compute-hash": "cd contracts && npx hardhat run scripts/compute-init-hash.ts"
   },
   "eslintConfig": {
     "extends": "react-app"
