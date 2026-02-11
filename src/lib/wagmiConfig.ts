@@ -15,7 +15,6 @@ export const tenChain: Chain = {
 
 export const wagmiConfig = createConfig({
   chains: [tenChain],
-  ssr: true,
   connectors: [injected()],
   transports: {
     [tenChain.id]: fallback([unstable_connector(injected), http(TEN_RPC_URL)])
