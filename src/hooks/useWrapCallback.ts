@@ -35,13 +35,11 @@ export default function useWrapCallback(
   return useMemo(() => {
     // Detect wrap/unwrap based on currencies alone — don't require wethContract for detection
     if (!chainId || !inputCurrency || !outputCurrency) {
-      console.log('[Wrap] NOT_APPLICABLE: missing', { chainId, inputCurrency: inputCurrency?.symbol, outputCurrency: outputCurrency?.symbol })
       return NOT_APPLICABLE
     }
 
     const weth = WETH[chainId]
     if (!weth) {
-      console.log('[Wrap] NOT_APPLICABLE: no WETH for chainId', chainId, 'WETH keys:', Object.keys(WETH))
       return NOT_APPLICABLE
     }
 
@@ -49,20 +47,6 @@ export default function useWrapCallback(
     const isOutputETH = outputCurrency === ETHER
     const isOutputWETH = outputCurrency instanceof Token && currencyEquals(weth, outputCurrency)
     const isInputWETH = inputCurrency instanceof Token && currencyEquals(weth, inputCurrency)
-
-    console.log('[Wrap] check:', {
-      chainId,
-      wethAddr: weth.address,
-      inputSymbol: inputCurrency.symbol,
-      outputSymbol: outputCurrency.symbol,
-      isInputETH,
-      isOutputETH,
-      isOutputWETH,
-      isInputWETH,
-      inputAddr: inputCurrency instanceof Token ? inputCurrency.address : 'ETHER',
-      outputAddr: outputCurrency instanceof Token ? outputCurrency.address : 'ETHER',
-      wethContract: !!wethContract
-    })
 
     const sufficientBalance = inputAmount && balance && !balance.lessThan(inputAmount)
 

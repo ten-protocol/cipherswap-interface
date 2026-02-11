@@ -36,8 +36,6 @@ export function useETHBalances(
     }
   })
 
-  console.log('[ETH Balance]', { primaryAddress, ethStatus, ethError: ethError?.message, balanceData })
-
   return useMemo(() => {
     if (!primaryAddress || !balanceData) return {}
     return {
@@ -81,25 +79,11 @@ export function useTokenBalancesWithLoadingIndicator(
     }
   })
 
-  console.log('[Token Balances]', {
-    address,
-    enabled,
-    tokenCount: validatedTokens.length,
-    tokens: validatedTokens.map(t => t.symbol),
-    contractCount: contracts.length,
-    readStatus,
-    readError: readError?.message,
-    isLoading,
-    dataLength: data?.length,
-    rawData: data
-  })
-
   const balances = useMemo(() => {
     if (!data || !address) return {}
     const result: { [tokenAddress: string]: TokenAmount } = {}
     validatedTokens.forEach((token, i) => {
       const entry = data[i]
-      console.log(`[Token Balance] ${token.symbol}:`, { status: entry?.status, result: entry?.result, error: (entry as any)?.error })
       if (entry && entry.status === 'success' && entry.result != null) {
         const raw = JSBI.BigInt(entry.result.toString())
         result[token.address] = new TokenAmount(token, raw)

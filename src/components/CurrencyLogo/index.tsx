@@ -14,7 +14,7 @@ const StyledEthereumLogo = styled.img<{ size: string }>`
   border-radius: 24px;
 `
 
-const StyledLogo = styled(Logo)<{ size: string }>`
+const StyledLogo = styled(Logo) <{ size: string }>`
   width: ${({ size }) => size};
   height: ${({ size }) => size};
 `
@@ -38,6 +38,8 @@ export default function CurrencyLogo({
   }, [currency])
 
   if (currency === ETHER) {
+    return <StyledEthereumLogo src={EthereumLogo} size={size} style={style} />
+  } else if (currency.symbol === "WETH") {
     return <StyledEthereumLogo src={EthereumLogo} size={size} style={style} />
   }
 
