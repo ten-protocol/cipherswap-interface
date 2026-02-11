@@ -124,9 +124,13 @@ function ConnectorIcon({ connector }: { connector: Connector }) {
     if (connector.icon) {
       setIconUrl(connector.icon)
     } else if (typeof connector.getProvider === 'function') {
-      connector.getProvider().then((provider: any) => {
-        if (provider?.icon) setIconUrl(provider.icon)
-      }).catch(() => {})
+      connector
+        .getProvider()
+        .then((provider: any) => {
+          if (provider?.icon) setIconUrl(provider.icon)
+        })
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        .catch(() => undefined)
     }
   }, [connector])
 
